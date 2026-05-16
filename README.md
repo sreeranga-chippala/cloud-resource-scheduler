@@ -6,6 +6,7 @@ This project simulates a real-world cloud resource scheduling system using advan
 
 The system dynamically allocates CPU, RAM, Storage, and Bandwidth resources to incoming jobs while maximizing revenue and utilization efficiency.
 
+---
 
 ## Features
 
@@ -20,6 +21,7 @@ The system dynamically allocates CPU, RAM, Storage, and Bandwidth resources to i
 - GitHub Actions CI/CD
 - Artifact Upload Automation
 
+---
 
 ## Tech Stack
 
@@ -33,6 +35,7 @@ The system dynamically allocates CPU, RAM, Storage, and Bandwidth resources to i
 | Version Control | Git + GitHub |
 | CI/CD | GitHub Actions |
 
+---
 
 ## System Workflow
 
@@ -50,35 +53,26 @@ Metrics Collection
 Visualization Generation
         ↓
 CI/CD Artifact Upload
-
-
+```
 
 ---
 
-# DOCKER EXECUTION
-
-Add:
-
-```md id="n2m4vu"
 ## Docker Execution
 
 ### Build Image
 
 ```bash
 docker build -t cloud-scheduler .
+```
 
-Run Project
+### Run Project
+
+```bash
 docker run --rm -v $(pwd):/app cloud-scheduler
-
-
+```
 
 ---
 
-# CI/CD SECTION
-
-Add:
-
-```md id="2nmh2r"
 ## CI/CD Pipeline
 
 GitHub Actions automatically:
@@ -90,6 +84,7 @@ GitHub Actions automatically:
 - Generates visual analytics
 - Uploads artifacts automatically
 
+---
 
 ## Complexity Analysis
 
@@ -101,6 +96,7 @@ GitHub Actions automatically:
 | Priority Queue Operations | O(log n) |
 | Visualization Generation | O(n) |
 
+---
 
 ## Folder Structure
 
@@ -119,3 +115,4 @@ cloud-scheduler/
 ├── main.cpp
 ├── Dockerfile
 └── README.md
+```
