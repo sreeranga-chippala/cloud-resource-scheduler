@@ -100,7 +100,7 @@ queue_smooth = (
 # 1. ONLINE RESOURCE UTILIZATION OVER TIME
 # =========================================================
 
-plt.figure(figsize=(12,6))
+plt.figure(figsize=(14, 7), dpi=300)
 
 sns.lineplot(
     x=timeline["Time"],
@@ -145,9 +145,10 @@ plt.ylabel(
 )
 
 plt.legend()
-
+plt.tight_layout()
 plt.savefig(
     "outputs/visualizations/online_resource_utilization.png",
+    dpi = 300,
     bbox_inches="tight"
 )
 
@@ -171,7 +172,7 @@ greedy_values = [
     greedy["BW"]
 ]
 
-plt.figure(figsize=(10,6))
+plt.figure(figsize=(14, 7), dpi=300)
 
 sns.barplot(
     x=resources,
@@ -191,9 +192,10 @@ plt.xlabel(
 plt.ylabel(
     "Utilization (% of Capacity)"
 )
-
+plt.tight_layout()
 plt.savefig(
     "outputs/visualizations/greedy_resource_utilization.png",
+    dpi = 300,
     bbox_inches="tight"
 )
 
@@ -218,7 +220,7 @@ revenue_rate_smooth = (
     .mean()
 )
 
-plt.figure(figsize=(12,6))
+plt.figure(figsize=(14, 7), dpi=300)
 
 sns.lineplot(
     x=timeline["Time"],
@@ -239,9 +241,10 @@ plt.xlabel(
 plt.ylabel(
     "Revenue Generated ($ per event)"
 )
-
+plt.tight_layout()
 plt.savefig(
     "outputs/visualizations/revenue_growth.png",
+    dpi = 300,
     bbox_inches="tight"
 )
 
@@ -250,7 +253,7 @@ plt.close()
 # 4. QUEUE PRESSURE ANALYSIS
 # =========================================================
 
-plt.figure(figsize=(12,6))
+plt.figure(figsize=(14, 7), dpi=300)
 
 sns.lineplot(
     x=timeline["Time"],
@@ -271,19 +274,18 @@ plt.xlabel(
 plt.ylabel(
     "Queued Jobs"
 )
-
+plt.tight_layout()
 plt.savefig(
     "outputs/visualizations/queue_pressure.png",
+    dpi = 300,
     bbox_inches="tight"
 )
 
-plt.close()
-
-# =========================================================
+plt.close()# =========================================================
 # 5. ONLINE DISTRIBUTION PIE CHART
 # =========================================================
 
-plt.figure(figsize=(7,7))
+plt.figure(figsize=(8, 8), dpi=300)
 
 sizes = [
     online["Accepted"],
@@ -295,11 +297,14 @@ labels = [
     "Rejected"
 ]
 
+colors = sns.color_palette("deep")
+
 plt.pie(
     sizes,
     labels=labels,
     autopct='%1.1f%%',
-    startangle=90
+    startangle=90,
+    colors=colors
 )
 
 plt.title(
@@ -308,8 +313,11 @@ plt.title(
     fontweight="bold"
 )
 
+plt.tight_layout()
+
 plt.savefig(
     "outputs/visualizations/job_distribution.png",
+    dpi=300,
     bbox_inches="tight"
 )
 
