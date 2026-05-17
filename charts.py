@@ -1,256 +1,242 @@
-import pandas as pd
-import matplotlib
-matplotlib.use("Agg")
-
-import matplotlib.pyplot as plt
-import seaborn as sns
 import os
+import pandas as pd
+import matplotlib.pyplot as plt
 
-# ============================================
-# CHART GENERATOR FUNCTION
-# ============================================
+# ==========================================
+# PATHS
+# ==========================================
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+METRICS_PATH = os.path.join(
+    BASE_DIR,
+    "outputs",
+    "metrics",
+    "metrics.csv"
+)
+
+TIMELINE_PATH = os.path.join(
+    BASE_DIR,
+    "outputs",
+    "metrics",
+    "timeline.csv"
+)
+
+VIZ_DIR = os.path.join(
+    BASE_DIR,
+    "outputs",
+    "visualizations"
+)
+
+os.makedirs(VIZ_DIR, exist_ok=True)
+
+# ==========================================
+# GLOBAL STYLE
+# ==========================================
+
+plt.style.use("default")
+
+plt.rcParams["figure.facecolor"] = "white"
+plt.rcParams["axes.facecolor"] = "white"
+plt.rcParams["savefig.facecolor"] = "white"
+
+# ==========================================
+# GENERATE CHARTS
+# ==========================================
 
 def generate_charts():
 
-    # ============================================
-    # BASE PATHS
-    # ============================================
-
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-    VISUAL_DIR = os.path.join(
-        BASE_DIR,
-        "outputs",
-        "visualizations"
-    )
-
-    METRICS_DIR = os.path.join(
-        BASE_DIR,
-        "outputs",
-        "metrics"
-    )
-
-    BUILDS_DIR = os.path.join(
-        BASE_DIR,
-        "builds"
-    )
-
-    os.makedirs(VISUAL_DIR, exist_ok=True)
-
-    # ============================================
-    # FILE PATHS
-    # ============================================
-
-    TIMELINE_CSV = os.path.join(
-        METRICS_DIR,
-        "timeline.csv"
-    )
-
-    METRICS_CSV = os.path.join(
-        METRICS_DIR,
-        "metrics.csv"
-    )
-
-    INPUT_TXT = os.path.join(
-        BUILDS_DIR,
-        "input.txt"
-    )
-
-    # ============================================
+    # =========================
     # LOAD DATA
-    # ============================================
+    # =========================
 
-    timeline = pd.read_csv(TIMELINE_CSV)
-
-    metrics = pd.read_csv(METRICS_CSV)
-
-    greedy = metrics.iloc[0]
+    metrics = pd.read_csv(METRICS_PATH)
+    timeline = pd.read_csv(TIMELINE_PATH)
 
     online = metrics.iloc[1]
 
-    # ============================================
-    # READ CLUSTER CAPACITY
-    # ============================================
-
-    with open(INPUT_TXT, "r") as f:
-
-        first = f.readline().split()
-
-        MAX_CPU = int(first[0])
-        MAX_RAM = int(first[1])
-        MAX_STORAGE = int(first[2])
-        MAX_BW = int(first[3])
-
-    # ============================================
-    # STYLE
-    # ============================================
-
-    sns.set_theme(
-        style="whitegrid",
-        palette="deep"
-    )
-
-    # ============================================
-    # NORMALIZED UTILIZATION
-    # ============================================
-
-    cpu_percent = (timeline["CPU"] / MAX_CPU) * 100
-    ram_percent = (timeline["RAM"] / MAX_RAM) * 100
-    storage_percent = (timeline["Storage"] / MAX_STORAGE) * 100
-    bw_percent = (timeline["BW"] / MAX_BW) * 100
-
-    WINDOW = 20
-
-    cpu_smooth = cpu_percent.rolling(WINDOW).mean()
-    ram_smooth = ram_percent.rolling(WINDOW).mean()
-    storage_smooth = storage_percent.rolling(WINDOW).mean()
-    bw_smooth = bw_percent.rolling(WINDOW).mean()
-    queue_smooth = timeline["Queue"].rolling(WINDOW).mean()
-
-    # ============================================
-    # ONLINE RESOURCE UTILIZATION
-    # ============================================
-
-    plt.figure(figsize=(14, 7))
-
-    sns.lineplot(x=timeline["Time"], y=cpu_smooth, label="CPU")
-    sns.lineplot(x=timeline["Time"], y=ram_smooth, label="RAM")
-    sns.lineplot(x=timeline["Time"], y=storage_smooth, label="Storage")
-    sns.lineplot(x=timeline["Time"], y=bw_smooth, label="Bandwidth")
-
-    plt.title("Online Resource Utilization")
-    plt.xlabel("Time")
-    plt.ylabel("Utilization (%)")
-
-    plt.tight_layout()
-
-    plt.savefig(
-        os.path.join(
-            VISUAL_DIR,
-            "online_resource_utilization.png"
-        )
-    )
-
-    plt.close()
-
-    # ============================================
+    # ======================================
     # GREEDY RESOURCE UTILIZATION
-    # ============================================
+    # ======================================
 
-    plt.figure(figsize=(10, 6))
-
-    sns.barplot(
-        x=["CPU", "RAM", "Storage", "Bandwidth"],
-        y=[
-            greedy["CPU"],
-            greedy["RAM"],
-            greedy["Storage"],
-            greedy["BW"]
-        ]
+    fig, ax = plt.subplots(
+        figsize=(10, 6),
+        facecolor="white"
     )
 
-    plt.title("Greedy Resource Utilization")
+    resources = [
+        "CPU",
+        "RAM",
+        "Storage",
+        "Bandwidth"
+    ]
+
+    values = [
+        online["CPU"],
+        online["RAM"],
+        online["Storage"],
+        online["BW"]
+    ]
+
+    ax.bar(resources, values)
+
+    ax.set_title("Greedy Resource Utilization")
+    ax.set_ylabel("Utilization (%)")
+    ax.set_ylim(0, 105)
 
     plt.tight_layout()
 
     plt.savefig(
         os.path.join(
-            VISUAL_DIR,
+            VIZ_DIR,
             "greedy_resource_utilization.png"
         )
     )
 
     plt.close()
 
-    # ============================================
-    # REVENUE GROWTH
-    # ============================================
-
-    revenue_rate = (
-        timeline["Revenue"]
-        .diff()
-        .fillna(0)
-    )
-
-    revenue_rate_smooth = (
-        revenue_rate
-        .rolling(WINDOW)
-        .mean()
-    )
-
-    plt.figure(figsize=(14, 7))
-
-    sns.lineplot(
-        x=timeline["Time"],
-        y=revenue_rate_smooth
-    )
-
-    plt.title("Revenue Growth")
-
-    plt.tight_layout()
-
-    plt.savefig(
-        os.path.join(
-            VISUAL_DIR,
-            "revenue_growth.png"
-        )
-    )
-
-    plt.close()
-
-    # ============================================
-    # QUEUE PRESSURE
-    # ============================================
-
-    plt.figure(figsize=(14, 7))
-
-    sns.lineplot(
-        x=timeline["Time"],
-        y=queue_smooth
-    )
-
-    plt.title("Queue Pressure")
-
-    plt.tight_layout()
-
-    plt.savefig(
-        os.path.join(
-            VISUAL_DIR,
-            "queue_pressure.png"
-        )
-    )
-
-    plt.close()
-
-    # ============================================
+    # ======================================
     # JOB DISTRIBUTION PIE CHART
-    # ============================================
+    # ======================================
 
-    plt.figure(figsize=(8, 8))
+    fig, ax = plt.subplots(
+        figsize=(8, 8),
+        facecolor="white"
+    )
 
-    plt.pie(
-        [online["Accepted"], online["Rejected"]],
-        labels=["Accepted", "Rejected"],
+    jobs = [
+        online["Accepted"],
+        online["Rejected"]
+    ]
+
+    labels = [
+        "Accepted",
+        "Rejected"
+    ]
+
+    ax.pie(
+        jobs,
+        labels=labels,
         autopct="%1.1f%%"
     )
 
-    plt.title("Job Distribution")
+    ax.set_title("Job Distribution")
 
     plt.tight_layout()
 
     plt.savefig(
         os.path.join(
-            VISUAL_DIR,
+            VIZ_DIR,
             "job_distribution.png"
         )
     )
 
     plt.close()
 
-# ============================================
-# DIRECT EXECUTION
-# ============================================
+    # ======================================
+    # ONLINE RESOURCE UTILIZATION
+    # ======================================
 
-if __name__ == "__main__":
+    fig, ax = plt.subplots(
+        figsize=(14, 7),
+        facecolor="white"
+    )
 
-    generate_charts()
+    ax.plot(
+        timeline["Time"],
+        timeline["CPU"],
+        label="CPU"
+    )
+
+    ax.plot(
+        timeline["Time"],
+        timeline["RAM"],
+        label="RAM"
+    )
+
+    ax.plot(
+        timeline["Time"],
+        timeline["Storage"],
+        label="Storage"
+    )
+
+    ax.plot(
+        timeline["Time"],
+        timeline["BW"],
+        label="Bandwidth"
+    )
+
+    ax.set_title("Online Resource Utilization")
+    ax.set_xlabel("Time")
+    ax.set_ylabel("Utilization (%)")
+
+    ax.legend()
+
+    plt.tight_layout()
+
+    plt.savefig(
+        os.path.join(
+            VIZ_DIR,
+            "online_resource_utilization.png"
+        )
+    )
+
+    plt.close()
+
+    # ======================================
+    # QUEUE PRESSURE
+    # ======================================
+
+    fig, ax = plt.subplots(
+        figsize=(14, 7),
+        facecolor="white"
+    )
+
+    ax.plot(
+        timeline["Time"],
+        timeline["Queue"]
+    )
+
+    ax.set_title("Queue Pressure")
+    ax.set_xlabel("Time")
+    ax.set_ylabel("Queue")
+
+    plt.tight_layout()
+
+    plt.savefig(
+        os.path.join(
+            VIZ_DIR,
+            "queue_pressure.png"
+        )
+    )
+
+    plt.close()
+
+    # ======================================
+    # REVENUE GROWTH
+    # ======================================
+
+    fig, ax = plt.subplots(
+        figsize=(14, 7),
+        facecolor="white"
+    )
+
+    ax.plot(
+        timeline["Time"],
+        timeline["Revenue"]
+    )
+
+    ax.set_title("Revenue Growth")
+    ax.set_xlabel("Time")
+    ax.set_ylabel("Revenue")
+
+    plt.tight_layout()
+
+    plt.savefig(
+        os.path.join(
+            VIZ_DIR,
+            "revenue_growth.png"
+        )
+    )
+
+    plt.close()
