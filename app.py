@@ -43,14 +43,9 @@ st.divider()
 # ==========================================
 # RUN BUTTON
 # ==========================================
-
 if st.button("Run Simulation"):
 
     with st.spinner("Running cloud scheduling simulation..."):
-
-        os.system("rm -f outputs/metrics/*.csv")
-
-        os.system("rm -f outputs/visualizations/*.png")
 
         os.system("gcc input_generator.c -o builds/gen")
 
@@ -69,6 +64,7 @@ if st.button("Run Simulation"):
 
     st.success("Simulation completed successfully")
 
+    st.rerun()
 # ==========================================
 # LOAD METRICS
 # ==========================================
