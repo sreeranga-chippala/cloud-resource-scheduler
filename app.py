@@ -3,6 +3,7 @@ import time
 import streamlit as st
 from PIL import Image
 import pandas as pd
+from charts import generate_charts
 
 # ==========================================
 # PAGE CONFIG
@@ -57,14 +58,7 @@ if st.button("Run Simulation"):
 
         os.system("./builds/run")
 
-        python_exec = "venv/bin/python"
-
-        if not os.path.exists(python_exec):
-            python_exec = "python3"
-
-        os.system(f"{python_exec} charts.py")
-
-        time.sleep(2)
+        generate_charts()
 
     st.success("Simulation completed successfully")
 # ==========================================
