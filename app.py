@@ -9,7 +9,7 @@ import plotly.express as px
 # ==========================================
 
 st.set_page_config(
-    page_title="Cloud Resource Scheduler",
+    page_title="AI Cloud Resource Scheduler",
     page_icon="☁️",
     layout="wide"
 )
@@ -21,139 +21,184 @@ st.set_page_config(
 st.markdown("""
 <style>
 
+html, body, [class*="css"] {
+    font-family: 'Inter', sans-serif;
+}
+
+/* MAIN APP */
+
 .stApp {
-    background-image: url("https://images.unsplash.com/photo-1516321318423-f06f85e504b3");
+
+    background-image:
+    linear-gradient(
+        rgba(5,10,20,0.80),
+        rgba(5,10,20,0.85)
+    ),
+    url("https://images.unsplash.com/photo-1462331940025-496dfbfc7564");
+
     background-size: cover;
+
     background-position: center;
+
     background-attachment: fixed;
+
     color: white;
 }
 
-/* DARK OVERLAY */
+/* MAIN CONTAINER */
 
-.stApp::before {
+.block-container {
 
-    content: "";
+    max-width: 1450px;
 
-    position: fixed;
+    padding-top: 2rem;
 
-    top: 0;
-    left: 0;
-
-    width: 100%;
-    height: 100%;
-
-    background: rgba(0,0,0,0.72);
-
-    z-index: -1;
+    padding-bottom: 2rem;
 }
 
-/* SIDEBAR */
-
-section[data-testid="stSidebar"] {
-
-    background: rgba(15,23,42,0.88);
-
-    backdrop-filter: blur(16px);
-
-    border-right: 1px solid rgba(255,255,255,0.08);
-}
-
-/* HERO */
+/* HERO SECTION */
 
 .hero {
 
-    padding: 45px;
+    padding: 55px;
 
-    border-radius: 28px;
+    border-radius: 30px;
 
-    background: linear-gradient(
-        135deg,
-        rgba(59,130,246,0.22),
-        rgba(15,23,42,0.88)
-    );
+    background: rgba(15,23,42,0.72);
 
-    backdrop-filter: blur(18px);
+    backdrop-filter: blur(16px);
 
     border: 1px solid rgba(255,255,255,0.08);
 
-    margin-top: 20px;
+    margin-bottom: 40px;
 
-    margin-bottom: 35px;
-
-    box-shadow: 0 15px 40px rgba(0,0,0,0.35);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.35);
 }
 
 /* METRIC CARDS */
 
 .metric-card {
 
-    background: rgba(255,255,255,0.08);
+    background: rgba(15,23,42,0.78);
 
-    backdrop-filter: blur(14px);
+    border-radius: 24px;
 
-    border-radius: 22px;
+    padding: 30px;
 
-    padding: 24px;
+    border: 1px solid rgba(255,255,255,0.06);
 
-    border: 1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(12px);
 
-    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+    min-height: 150px;
 
-    transition: 0.3s ease;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+
+    transition: 0.3s;
 }
 
 .metric-card:hover {
 
-    transform: translateY(-5px);
+    transform: translateY(-6px);
 
-    border: 1px solid #60a5fa;
-
-    box-shadow: 0 15px 40px rgba(59,130,246,0.3);
+    border: 1px solid #3b82f6;
 }
 
 .metric-title {
 
     color: #cbd5e1;
 
-    font-size: 15px;
+    font-size: 18px;
 
-    margin-bottom: 10px;
+    margin-bottom: 15px;
 }
 
 .metric-value {
 
+    font-size: 38px;
+
+    font-weight: 800;
+
     color: white;
-
-    font-size: 34px;
-
-    font-weight: bold;
 }
 
 /* CHART CONTAINER */
 
 .chart-container {
 
-    background: rgba(255,255,255,0.06);
-
-    backdrop-filter: blur(14px);
+    background: rgba(15,23,42,0.82);
 
     border-radius: 24px;
 
-    padding: 20px;
+    padding: 25px;
 
-    border: 1px solid rgba(255,255,255,0.08);
+    margin-bottom: 35px;
 
-    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.06);
 
-    margin-bottom: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
 }
 
-/* TEXT */
+/* SIDEBAR */
 
-h1, h2, h3 {
+section[data-testid="stSidebar"] {
+
+    background: rgba(15,23,42,0.94);
+
+    border-right: 1px solid rgba(255,255,255,0.05);
+}
+
+/* TITLES */
+
+h1 {
+
+    font-size: 58px !important;
+
+    font-weight: 800 !important;
 
     color: white !important;
+}
+
+h2, h3 {
+
+    color: white !important;
+}
+
+/* BUTTON */
+
+.stButton>button {
+
+    background: linear-gradient(
+        135deg,
+        #2563eb,
+        #1d4ed8
+    );
+
+    color: white;
+
+    border-radius: 14px;
+
+    border: none;
+
+    padding: 14px 26px;
+
+    font-size: 18px;
+
+    font-weight: 600;
+
+    transition: 0.3s;
+
+    box-shadow: 0 8px 20px rgba(37,99,235,0.35);
+}
+
+.stButton>button:hover {
+
+    transform: translateY(-2px);
+
+    background: linear-gradient(
+        135deg,
+        #3b82f6,
+        #2563eb
+    );
 }
 
 /* REMOVE STREAMLIT */
@@ -174,23 +219,13 @@ st.sidebar.title("☁️ Cloud Scheduler")
 st.sidebar.markdown("""
 ### Features
 
-- AI Scheduling
+- AI Resource Scheduling
 - Runtime Analytics
 - Queue Optimization
 - AWS EC2 Deployment
-- GitHub Actions CI/CD
-- Real-Time Monitoring
+- CI/CD Automation
+- Cloud Monitoring
 """)
-
-# ==========================================
-# TITLE
-# ==========================================
-
-st.title("☁️ Cloud Resource Scheduler")
-
-st.caption(
-    "Real-Time Infrastructure Scheduling and Cloud Analytics Dashboard"
-)
 
 # ==========================================
 # HERO SECTION
@@ -200,22 +235,24 @@ st.markdown("""
 <div class="hero">
 
 <div style="
-font-size:54px;
+font-size:62px;
 font-weight:800;
-margin-bottom:12px;
+margin-bottom:15px;
 ">
 ☁️ AI Cloud Resource Scheduler
 </div>
 
 <div style="
-font-size:22px;
+font-size:24px;
 color:#cbd5e1;
-line-height:1.6;
-max-width:900px;
+line-height:1.7;
+max-width:1000px;
 ">
-Real-Time Cloud Infrastructure Monitoring, Intelligent Resource Allocation,
-Queue Optimization, Revenue Analytics, and AI-Based Scheduling Simulation
-Platform deployed on AWS EC2 with CI/CD automation.
+Real-Time Cloud Infrastructure Monitoring,
+Intelligent Scheduling,
+Revenue Analytics,
+Queue Optimization,
+and AI-Based Resource Allocation Platform deployed on AWS EC2 with CI/CD automation.
 </div>
 
 </div>
@@ -228,13 +265,13 @@ Platform deployed on AWS EC2 with CI/CD automation.
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    st.success("🟢 EC2 Deployment Active")
+    st.success("🟢 AWS EC2 Active")
 
 with col2:
-    st.info("⚡ GitHub Actions CI/CD Connected")
+    st.info("⚡ GitHub Actions Connected")
 
 with col3:
-    st.warning("☁️ AWS Cloud Environment")
+    st.warning("☁️ Cloud Deployment Enabled")
 
 st.divider()
 
@@ -244,7 +281,7 @@ st.divider()
 
 if st.button("🚀 Run Simulation"):
 
-    with st.spinner("Running simulation..."):
+    with st.spinner("Running cloud scheduling simulation..."):
 
         os.system("gcc input_generator.c -o builds/gen")
 
@@ -283,9 +320,9 @@ if os.path.exists(metrics_path) and os.path.exists(timeline_path):
 
         ("💰 Revenue", f"${int(online['Revenue'])}"),
 
-        ("✅ Accepted", int(online["Accepted"])),
+        ("✅ Accepted Jobs", int(online["Accepted"])),
 
-        ("❌ Rejected", int(online["Rejected"])),
+        ("❌ Rejected Jobs", int(online["Rejected"])),
 
         ("🖥️ CPU Usage", f"{online['CPU']:.2f}%")
     ]
@@ -328,7 +365,7 @@ if os.path.exists(metrics_path) and os.path.exists(timeline_path):
     st.divider()
 
     # ======================================
-    # RESOURCE CHART
+    # RESOURCE UTILIZATION
     # ======================================
 
     st.subheader("📈 Resource Utilization")
@@ -369,7 +406,7 @@ if os.path.exists(metrics_path) and os.path.exists(timeline_path):
 
     fig1.update_layout(
 
-        template="none",
+        template="plotly",
 
         paper_bgcolor="rgba(0,0,0,0)",
 
@@ -377,7 +414,9 @@ if os.path.exists(metrics_path) and os.path.exists(timeline_path):
 
         font=dict(color="white"),
 
-        height=500,
+        height=420,
+
+        margin=dict(l=20, r=20, t=40, b=20),
 
         xaxis=dict(
             gridcolor="rgba(255,255,255,0.08)"
@@ -390,7 +429,11 @@ if os.path.exists(metrics_path) and os.path.exists(timeline_path):
 
     st.markdown('<div class="chart-container">', unsafe_allow_html=True)
 
-    st.plotly_chart(fig1, use_container_width=True)
+    st.plotly_chart(
+        fig1,
+        use_container_width=True,
+        config={"displayModeBar": False}
+    )
 
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -416,7 +459,7 @@ if os.path.exists(metrics_path) and os.path.exists(timeline_path):
 
         fig2.update_layout(
 
-            template="none",
+            template="plotly",
 
             paper_bgcolor="rgba(0,0,0,0)",
 
@@ -424,12 +467,18 @@ if os.path.exists(metrics_path) and os.path.exists(timeline_path):
 
             font=dict(color="white"),
 
-            height=400
+            height=350,
+
+            margin=dict(l=20, r=20, t=40, b=20)
         )
 
         st.markdown('<div class="chart-container">', unsafe_allow_html=True)
 
-        st.plotly_chart(fig2, use_container_width=True)
+        st.plotly_chart(
+            fig2,
+            use_container_width=True,
+            config={"displayModeBar": False}
+        )
 
         st.markdown('</div>', unsafe_allow_html=True)
 
@@ -449,7 +498,7 @@ if os.path.exists(metrics_path) and os.path.exists(timeline_path):
 
         fig3.update_layout(
 
-            template="none",
+            template="plotly",
 
             paper_bgcolor="rgba(0,0,0,0)",
 
@@ -457,12 +506,18 @@ if os.path.exists(metrics_path) and os.path.exists(timeline_path):
 
             font=dict(color="white"),
 
-            height=400
+            height=350,
+
+            margin=dict(l=20, r=20, t=40, b=20)
         )
 
         st.markdown('<div class="chart-container">', unsafe_allow_html=True)
 
-        st.plotly_chart(fig3, use_container_width=True)
+        st.plotly_chart(
+            fig3,
+            use_container_width=True,
+            config={"displayModeBar": False}
+        )
 
         st.markdown('</div>', unsafe_allow_html=True)
 
@@ -490,9 +545,13 @@ if os.path.exists(metrics_path) and os.path.exists(timeline_path):
         color_discrete_sequence=["#10b981", "#ef4444"]
     )
 
+    fig4.update_traces(
+        textfont_size=18
+    )
+
     fig4.update_layout(
 
-        template="none",
+        template="plotly",
 
         paper_bgcolor="rgba(0,0,0,0)",
 
@@ -500,20 +559,26 @@ if os.path.exists(metrics_path) and os.path.exists(timeline_path):
 
         font=dict(color="white"),
 
-        height=500
+        height=450,
+
+        margin=dict(l=20, r=20, t=40, b=20)
     )
 
     st.markdown('<div class="chart-container">', unsafe_allow_html=True)
 
-    st.plotly_chart(fig4, use_container_width=True)
+    st.plotly_chart(
+        fig4,
+        use_container_width=True,
+        config={"displayModeBar": False}
+    )
 
     st.markdown('</div>', unsafe_allow_html=True)
-
-    st.divider()
 
     # ======================================
     # TABLE
     # ======================================
+
+    st.divider()
 
     with st.expander("🗂️ View Detailed Metrics"):
 
