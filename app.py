@@ -121,7 +121,7 @@ if st.button("▶ Run Simulation"):
 
         run_id = str(int(time.time()))
         try:
-            generate_charts(run_id)
+            generate_charts()
         except Exception as e:
             st.error(f"Chart generation failed: {e}")
             st.stop()
