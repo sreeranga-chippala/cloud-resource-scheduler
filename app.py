@@ -7,11 +7,40 @@ from charts import generate_charts
 # ==========================================
 # PAGE CONFIG
 # ==========================================
+
 st.set_page_config(
     page_title="Cloud Resource Scheduler",
     page_icon="☁️",
     layout="wide"
 )
+
+# ==========================================
+# SIMPLE CLEAN UI
+# ==========================================
+
+st.markdown("""
+<style>
+
+#MainMenu {
+    visibility: hidden;
+}
+
+footer {
+    visibility: hidden;
+}
+
+header {
+    visibility: hidden;
+}
+
+.block-container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
 # ==========================================
 # SIDEBAR
 # ==========================================
@@ -21,12 +50,13 @@ st.sidebar.title("Cloud Scheduler")
 st.sidebar.markdown("""
 ### Features
 
-- Online Scheduling
 - Greedy Scheduling
+- Online Scheduling
+- Queue Simulation
+- Resource Allocation
 - Runtime Analytics
 - Docker Deployment
-- GitHub Actions CI/CD
-- Cloud Deployment
+- CI/CD Automation
 """)
 
 # ==========================================
@@ -36,7 +66,7 @@ st.sidebar.markdown("""
 st.title("Cloud Resource Scheduler Dashboard")
 
 st.caption(
-    "Cloud-native resource scheduling simulation with analytics and DevOps automation."
+    "Dynamic cloud resource scheduling simulation using Greedy and Online algorithms."
 )
 
 st.divider()
@@ -44,46 +74,51 @@ st.divider()
 # ==========================================
 # RUN BUTTON
 # ==========================================
-# ==========================================
-# RUN BUTTON
-# ==========================================
 
 if st.button("Run Simulation"):
 
-    with st.spinner("Running cloud scheduling simulation..."):
+    with st.spinner("Running simulation..."):
 
-        # Clear old charts first
-        for file in os.listdir("outputs/visualizations"):
-            if file.endswith(".png"):
-                os.remove(
-                    os.path.join(
-                        "outputs/visualizations",
-                        file
+        # Clear old charts
+        if os.path.exists("outputs/visualizations"):
+
+            for file in os.listdir("outputs/visualizations"):
+
+                if file.endswith(".png"):
+
+                    os.remove(
+                        os.path.join(
+                            "outputs/visualizations",
+                            file
+                        )
                     )
-                )
 
         # Compile generator
-        os.system("gcc input_generator.c -o builds/gen")
+        os.system(
+            "gcc input_generator.c -o builds/gen"
+        )
 
         # Compile scheduler
-        os.system("g++ -std=c++17 main.cpp -o builds/run")
+        os.system(
+            "g++ -std=c++17 main.cpp -o builds/run"
+        )
 
-        # Generate workload
+        # Generate jobs
         os.system("./builds/gen")
 
-        # Run scheduler
+        # Run simulation
         os.system("./builds/run")
 
         # Generate charts
         generate_charts()
 
-        # Force Streamlit refresh
         st.cache_data.clear()
         st.cache_resource.clear()
 
-    st.success("Simulation completed successfully")
+    st.success("Simulation completed")
 
     st.rerun()
+
 # ==========================================
 # LOAD METRICS
 # ==========================================
@@ -97,7 +132,7 @@ if os.path.exists(metrics_path):
     online = metrics.iloc[1]
 
     # ======================================
-    # KPI METRICS
+    # METRICS
     # ======================================
 
     st.header("System Metrics")
@@ -124,7 +159,7 @@ if os.path.exists(metrics_path):
 
     with col4:
         st.metric(
-            "CPU Utilization",
+            "CPU Usage",
             f"{online['CPU']:.2f}%"
         )
 
@@ -132,26 +167,26 @@ if os.path.exists(metrics_path):
 
     with col5:
         st.metric(
-            "Storage Utilization",
+            "Storage",
             f"{online['Storage']:.2f}%"
         )
 
     with col6:
         st.metric(
-            "RAM Utilization",
+            "RAM",
             f"{online['RAM']:.2f}%"
         )
 
     with col7:
         st.metric(
-            "Bandwidth Utilization",
+            "Bandwidth",
             f"{online['BW']:.2f}%"
         )
 
     st.divider()
 
     # ======================================
-    # METRICS TABLE
+    # DETAILED TABLE
     # ======================================
 
     st.header("Detailed Metrics")
@@ -169,11 +204,16 @@ if os.path.exists(metrics_path):
 
 st.header("Visual Analytics")
 
-top_charts = [
+charts = [
 
     (
         "Revenue Growth",
         "outputs/visualizations/revenue_growth.png"
+    ),
+
+    (
+        "Queue Pressure",
+        "outputs/visualizations/queue_pressure.png"
     ),
 
     (
@@ -184,11 +224,6 @@ top_charts = [
     (
         "Online Resource Utilization",
         "outputs/visualizations/online_resource_utilization.png"
-    ),
-
-    (
-        "Queue Pressure",
-        "outputs/visualizations/queue_pressure.png"
     )
 ]
 
@@ -196,14 +231,13 @@ top_charts = [
 # DISPLAY CHARTS
 # ==========================================
 
-for i in range(0, len(top_charts), 2):
+for i in range(0, len(charts), 2):
 
     col1, col2 = st.columns(2)
 
-    # LEFT CHART
     with col1:
 
-        title, path = top_charts[i]
+        title, path = charts[i]
 
         if os.path.exists(path):
 
@@ -216,10 +250,9 @@ for i in range(0, len(top_charts), 2):
                 use_container_width=True
             )
 
-    # RIGHT CHART
     with col2:
 
-        title, path = top_charts[i + 1]
+        title, path = charts[i + 1]
 
         if os.path.exists(path):
 
@@ -235,28 +268,26 @@ for i in range(0, len(top_charts), 2):
     st.divider()
 
 # ==========================================
-# PIE CHART
+# JOB DISTRIBUTION
 # ==========================================
 
-st.subheader("Job Distribution")
+st.header("Job Distribution")
 
-_, center_col, _ = st.columns([1, 2, 1])
+pie_path = (
+    "outputs/visualizations/job_distribution.png"
+)
 
-with center_col:
+if os.path.exists(pie_path):
 
-    pie_path = "outputs/visualizations/job_distribution.png"
+    image = Image.open(pie_path)
 
-    if os.path.exists(pie_path):
+    st.image(
+        image,
+        use_container_width=True
+    )
 
-        image = Image.open(pie_path)
+else:
 
-        st.image(
-            image,
-            use_container_width=True
-        )
-
-    else:
-
-        st.warning(
-            "Job distribution chart not available."
-        )
+    st.warning(
+        "Job distribution chart not found."
+    )
