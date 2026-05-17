@@ -1,4 +1,5 @@
 import os
+import time
 import streamlit as st
 from PIL import Image
 import pandas as pd
@@ -63,9 +64,9 @@ if st.button("Run Simulation"):
 
         os.system(f"{python_exec} charts.py")
 
-    st.success("Simulation completed successfully")
+        time.sleep(2)
 
-    st.rerun()
+    st.success("Simulation completed successfully")
 # ==========================================
 # LOAD METRICS
 # ==========================================
