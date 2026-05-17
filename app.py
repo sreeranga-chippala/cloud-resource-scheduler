@@ -17,23 +17,19 @@ st.set_page_config(
 # ==========================================
 # CUSTOM CSS
 # ==========================================
+
 st.markdown("""
 <style>
 
 .stApp {
-
-    background-image: url("https://images.unsplash.com/photo-1451187580459-43490279c0fa");
-
+    background-image: url("https://images.unsplash.com/photo-1516321318423-f06f85e504b3");
     background-size: cover;
-
-    background-attachment: fixed;
-
     background-position: center;
-
+    background-attachment: fixed;
     color: white;
 }
 
-/* overlay */
+/* DARK OVERLAY */
 
 .stApp::before {
 
@@ -42,30 +38,53 @@ st.markdown("""
     position: fixed;
 
     top: 0;
-
     left: 0;
 
     width: 100%;
-
     height: 100%;
 
-    background: rgba(0, 0, 0, 0.72);
+    background: rgba(0,0,0,0.72);
 
     z-index: -1;
 }
 
-/* sidebar */
+/* SIDEBAR */
 
 section[data-testid="stSidebar"] {
 
-    background: rgba(15, 23, 42, 0.85);
+    background: rgba(15,23,42,0.88);
 
-    backdrop-filter: blur(14px);
+    backdrop-filter: blur(16px);
 
     border-right: 1px solid rgba(255,255,255,0.08);
 }
 
-/* cards */
+/* HERO */
+
+.hero {
+
+    padding: 45px;
+
+    border-radius: 28px;
+
+    background: linear-gradient(
+        135deg,
+        rgba(59,130,246,0.22),
+        rgba(15,23,42,0.88)
+    );
+
+    backdrop-filter: blur(18px);
+
+    border: 1px solid rgba(255,255,255,0.08);
+
+    margin-top: 20px;
+
+    margin-bottom: 35px;
+
+    box-shadow: 0 15px 40px rgba(0,0,0,0.35);
+}
+
+/* METRIC CARDS */
 
 .metric-card {
 
@@ -73,15 +92,15 @@ section[data-testid="stSidebar"] {
 
     backdrop-filter: blur(14px);
 
-    border: 1px solid rgba(255,255,255,0.1);
-
-    border-radius: 20px;
+    border-radius: 22px;
 
     padding: 24px;
 
-    transition: 0.3s ease;
+    border: 1px solid rgba(255,255,255,0.08);
 
     box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+
+    transition: 0.3s ease;
 }
 
 .metric-card:hover {
@@ -93,8 +112,6 @@ section[data-testid="stSidebar"] {
     box-shadow: 0 15px 40px rgba(59,130,246,0.3);
 }
 
-/* metric title */
-
 .metric-title {
 
     color: #cbd5e1;
@@ -103,8 +120,6 @@ section[data-testid="stSidebar"] {
 
     margin-bottom: 10px;
 }
-
-/* metric value */
 
 .metric-value {
 
@@ -115,88 +130,60 @@ section[data-testid="stSidebar"] {
     font-weight: bold;
 }
 
-/* charts */
+/* CHART CONTAINER */
 
 .chart-container {
 
     background: rgba(255,255,255,0.06);
 
-    backdrop-filter: blur(12px);
+    backdrop-filter: blur(14px);
 
-    border-radius: 20px;
+    border-radius: 24px;
 
     padding: 20px;
 
     border: 1px solid rgba(255,255,255,0.08);
 
     box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+
+    margin-bottom: 25px;
 }
 
-/* text */
+/* TEXT */
 
-h1 {
-
-    font-size: 48px !important;
-
-    font-weight: 800 !important;
+h1, h2, h3 {
 
     color: white !important;
 }
 
-h2, h3 {
+/* REMOVE STREAMLIT */
 
-    color: white !important;
-}
-
-/* hide streamlit */
-
-#MainMenu {
-
-    visibility: hidden;
-}
-
-footer {
-
-    visibility: hidden;
-}
-
-header {
-
-    visibility: hidden;
-}
+#MainMenu {visibility:hidden;}
+footer {visibility:hidden;}
+header {visibility:hidden;}
 
 </style>
 """, unsafe_allow_html=True)
+
 # ==========================================
 # SIDEBAR
 # ==========================================
 
 st.sidebar.title("☁️ Cloud Scheduler")
-st.markdown("""
-<div style="
-padding:40px;
-border-radius:25px;
-background:rgba(255,255,255,0.08);
-backdrop-filter:blur(14px);
-margin-bottom:30px;
-">
 
-<h1 style="margin-bottom:10px;">
-☁️ AI Cloud Resource Scheduler
-</h1>
+st.sidebar.markdown("""
+### Features
 
-<p style="
-font-size:20px;
-color:#cbd5e1;
-">
-Real-Time Infrastructure Monitoring and Intelligent Cloud Scheduling Platform
-</p>
-
-</div>
-""", unsafe_allow_html=True)
+- AI Scheduling
+- Runtime Analytics
+- Queue Optimization
+- AWS EC2 Deployment
+- GitHub Actions CI/CD
+- Real-Time Monitoring
+""")
 
 # ==========================================
-# HEADER
+# TITLE
 # ==========================================
 
 st.title("☁️ Cloud Resource Scheduler")
@@ -205,10 +192,54 @@ st.caption(
     "Real-Time Infrastructure Scheduling and Cloud Analytics Dashboard"
 )
 
+# ==========================================
+# HERO SECTION
+# ==========================================
+
+st.markdown("""
+<div class="hero">
+
+<div style="
+font-size:54px;
+font-weight:800;
+margin-bottom:12px;
+">
+☁️ AI Cloud Resource Scheduler
+</div>
+
+<div style="
+font-size:22px;
+color:#cbd5e1;
+line-height:1.6;
+max-width:900px;
+">
+Real-Time Cloud Infrastructure Monitoring, Intelligent Resource Allocation,
+Queue Optimization, Revenue Analytics, and AI-Based Scheduling Simulation
+Platform deployed on AWS EC2 with CI/CD automation.
+</div>
+
+</div>
+""", unsafe_allow_html=True)
+
+# ==========================================
+# STATUS BAR
+# ==========================================
+
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.success("🟢 EC2 Deployment Active")
+
+with col2:
+    st.info("⚡ GitHub Actions CI/CD Connected")
+
+with col3:
+    st.warning("☁️ AWS Cloud Environment")
+
 st.divider()
 
 # ==========================================
-# RUN SIMULATION
+# RUN BUTTON
 # ==========================================
 
 if st.button("🚀 Run Simulation"):
@@ -226,7 +257,7 @@ if st.button("🚀 Run Simulation"):
     st.success("Simulation completed successfully")
 
 # ==========================================
-# LOAD CSV FILES
+# LOAD DATA
 # ==========================================
 
 metrics_path = "outputs/metrics/metrics.csv"
@@ -241,28 +272,25 @@ if os.path.exists(metrics_path) and os.path.exists(timeline_path):
     online = metrics.iloc[1]
 
     # ======================================
-    # KPI SECTION
+    # METRICS
     # ======================================
 
     st.subheader("📊 System Metrics")
 
-    col1, col2, col3, col4 = st.columns(4)
+    cols = st.columns(4)
 
-    metrics_data = [
+    metric_data = [
 
         ("💰 Revenue", f"${int(online['Revenue'])}"),
 
-        ("✅ Accepted Jobs", int(online["Accepted"])),
+        ("✅ Accepted", int(online["Accepted"])),
 
-        ("❌ Rejected Jobs", int(online["Rejected"])),
+        ("❌ Rejected", int(online["Rejected"])),
 
         ("🖥️ CPU Usage", f"{online['CPU']:.2f}%")
     ]
 
-    for col, (title, value) in zip(
-        [col1, col2, col3, col4],
-        metrics_data
-    ):
+    for col, (title, value) in zip(cols, metric_data):
 
         with col:
 
@@ -275,9 +303,9 @@ if os.path.exists(metrics_path) and os.path.exists(timeline_path):
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    col5, col6, col7 = st.columns(3)
+    cols2 = st.columns(3)
 
-    more_metrics = [
+    metric_data2 = [
 
         ("💾 Storage", f"{online['Storage']:.2f}%"),
 
@@ -286,10 +314,7 @@ if os.path.exists(metrics_path) and os.path.exists(timeline_path):
         ("📡 Bandwidth", f"{online['BW']:.2f}%")
     ]
 
-    for col, (title, value) in zip(
-        [col5, col6, col7],
-        more_metrics
-    ):
+    for col, (title, value) in zip(cols2, metric_data2):
 
         with col:
 
@@ -303,74 +328,71 @@ if os.path.exists(metrics_path) and os.path.exists(timeline_path):
     st.divider()
 
     # ======================================
-    # RESOURCE UTILIZATION
+    # RESOURCE CHART
     # ======================================
 
     st.subheader("📈 Resource Utilization")
 
     fig1 = go.Figure()
 
-    fig1.add_trace(
-        go.Scatter(
-            x=timeline["Time"],
-            y=timeline["CPU"],
-            mode="lines",
-            name="CPU",
-            line=dict(color="#3b82f6", width=3)
-        )
-    )
+    fig1.add_trace(go.Scatter(
+        x=timeline["Time"],
+        y=timeline["CPU"],
+        mode="lines",
+        name="CPU",
+        line=dict(color="#3b82f6", width=3)
+    ))
 
-    fig1.add_trace(
-        go.Scatter(
-            x=timeline["Time"],
-            y=timeline["RAM"],
-            mode="lines",
-            name="RAM",
-            line=dict(color="#10b981", width=3)
-        )
-    )
+    fig1.add_trace(go.Scatter(
+        x=timeline["Time"],
+        y=timeline["RAM"],
+        mode="lines",
+        name="RAM",
+        line=dict(color="#10b981", width=3)
+    ))
 
-    fig1.add_trace(
-        go.Scatter(
-            x=timeline["Time"],
-            y=timeline["Storage"],
-            mode="lines",
-            name="Storage",
-            line=dict(color="#f59e0b", width=3)
-        )
-    )
+    fig1.add_trace(go.Scatter(
+        x=timeline["Time"],
+        y=timeline["Storage"],
+        mode="lines",
+        name="Storage",
+        line=dict(color="#f59e0b", width=3)
+    ))
 
-    fig1.add_trace(
-        go.Scatter(
-            x=timeline["Time"],
-            y=timeline["BW"],
-            mode="lines",
-            name="Bandwidth",
-            line=dict(color="#ef4444", width=3)
-        )
-    )
+    fig1.add_trace(go.Scatter(
+        x=timeline["Time"],
+        y=timeline["BW"],
+        mode="lines",
+        name="Bandwidth",
+        line=dict(color="#ef4444", width=3)
+    ))
 
     fig1.update_layout(
 
-        template="plotly_dark",
+        template="none",
 
-        paper_bgcolor="#0f172a",
+        paper_bgcolor="rgba(0,0,0,0)",
 
-        plot_bgcolor="#0f172a",
+        plot_bgcolor="rgba(0,0,0,0)",
 
         font=dict(color="white"),
 
         height=500,
 
-        margin=dict(l=20, r=20, t=40, b=20)
+        xaxis=dict(
+            gridcolor="rgba(255,255,255,0.08)"
+        ),
+
+        yaxis=dict(
+            gridcolor="rgba(255,255,255,0.08)"
+        )
     )
 
-    st.plotly_chart(
-        fig1,
-        use_container_width=True
-    )
+    st.markdown('<div class="chart-container">', unsafe_allow_html=True)
 
-    st.divider()
+    st.plotly_chart(fig1, use_container_width=True)
+
+    st.markdown('</div>', unsafe_allow_html=True)
 
     # ======================================
     # REVENUE + QUEUE
@@ -378,89 +400,71 @@ if os.path.exists(metrics_path) and os.path.exists(timeline_path):
 
     colA, colB = st.columns(2)
 
-    # ======================================
-    # REVENUE CHART
-    # ======================================
-
     with colA:
 
         st.subheader("💰 Revenue Growth")
 
-        fig2 = go.Figure()
+        fig2 = px.line(
+            timeline,
+            x="Time",
+            y="Revenue"
+        )
 
-        fig2.add_trace(
-            go.Scatter(
-                x=timeline["Time"],
-                y=timeline["Revenue"],
-                mode="lines",
-                line=dict(
-                    color="#3b82f6",
-                    width=3
-                ),
-                name="Revenue"
-            )
+        fig2.update_traces(
+            line=dict(color="#3b82f6", width=3)
         )
 
         fig2.update_layout(
 
-            template="plotly_dark",
+            template="none",
 
-            paper_bgcolor="#0f172a",
+            paper_bgcolor="rgba(0,0,0,0)",
 
-            plot_bgcolor="#0f172a",
+            plot_bgcolor="rgba(0,0,0,0)",
 
             font=dict(color="white"),
 
             height=400
         )
 
-        st.plotly_chart(
-            fig2,
-            use_container_width=True
-        )
+        st.markdown('<div class="chart-container">', unsafe_allow_html=True)
 
-    # ======================================
-    # QUEUE CHART
-    # ======================================
+        st.plotly_chart(fig2, use_container_width=True)
+
+        st.markdown('</div>', unsafe_allow_html=True)
 
     with colB:
 
         st.subheader("⏳ Queue Pressure")
 
-        fig3 = go.Figure()
+        fig3 = px.line(
+            timeline,
+            x="Time",
+            y="Queue"
+        )
 
-        fig3.add_trace(
-            go.Scatter(
-                x=timeline["Time"],
-                y=timeline["Queue"],
-                mode="lines",
-                line=dict(
-                    color="#ef4444",
-                    width=3
-                ),
-                name="Queue"
-            )
+        fig3.update_traces(
+            line=dict(color="#ef4444", width=3)
         )
 
         fig3.update_layout(
 
-            template="plotly_dark",
+            template="none",
 
-            paper_bgcolor="#0f172a",
+            paper_bgcolor="rgba(0,0,0,0)",
 
-            plot_bgcolor="#0f172a",
+            plot_bgcolor="rgba(0,0,0,0)",
 
             font=dict(color="white"),
 
             height=400
         )
 
-        st.plotly_chart(
-            fig3,
-            use_container_width=True
-        )
+        st.markdown('<div class="chart-container">', unsafe_allow_html=True)
 
-    st.divider()
+        st.plotly_chart(fig3, use_container_width=True)
+
+        st.markdown('</div>', unsafe_allow_html=True)
 
     # ======================================
     # PIE CHART
@@ -479,48 +483,41 @@ if os.path.exists(metrics_path) and os.path.exists(timeline_path):
     })
 
     fig4 = px.pie(
-
         pie_data,
-
         names="Status",
-
         values="Count",
-
         hole=0.45,
-
-        color_discrete_sequence=[
-            "#10b981",
-            "#ef4444"
-        ]
+        color_discrete_sequence=["#10b981", "#ef4444"]
     )
 
     fig4.update_layout(
 
-        template="plotly_dark",
+        template="none",
 
-        paper_bgcolor="#0f172a",
+        paper_bgcolor="rgba(0,0,0,0)",
 
-        plot_bgcolor="#0f172a",
+        plot_bgcolor="rgba(0,0,0,0)",
 
         font=dict(color="white"),
 
         height=500
     )
 
-    st.plotly_chart(
-        fig4,
-        use_container_width=True
-    )
+    st.markdown('<div class="chart-container">', unsafe_allow_html=True)
+
+    st.plotly_chart(fig4, use_container_width=True)
+
+    st.markdown('</div>', unsafe_allow_html=True)
 
     st.divider()
 
     # ======================================
-    # METRICS TABLE
+    # TABLE
     # ======================================
 
-    st.subheader("🗂️ Detailed Metrics")
+    with st.expander("🗂️ View Detailed Metrics"):
 
-    st.dataframe(
-        metrics,
-        use_container_width=True
-    )
+        st.dataframe(
+            metrics,
+            use_container_width=True
+        )
