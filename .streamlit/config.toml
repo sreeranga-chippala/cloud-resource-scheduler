@@ -1,9 +1,0 @@
-[theme]
-primaryColor="#2563eb"
-
-[server]
-headless=true
-
-[browser]
-gatherUsageStats=false
-serverAddress="0.0.0.0"
