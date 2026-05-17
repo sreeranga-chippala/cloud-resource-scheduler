@@ -48,6 +48,10 @@ if st.button("Run Simulation"):
 
     with st.spinner("Running cloud scheduling simulation..."):
 
+        os.system("rm -f outputs/metrics/*.csv")
+
+        os.system("rm -f outputs/visualizations/*.png")
+
         os.system("gcc input_generator.c -o builds/gen")
 
         os.system("g++ -std=c++17 main.cpp -o builds/run")
@@ -140,7 +144,7 @@ if os.path.exists(metrics_path):
 
     st.dataframe(
         metrics,
-        use_container_width=True
+        width="stretch"
     )
 
     st.divider()
@@ -196,7 +200,7 @@ for i in range(0, len(top_charts), 2):
 
             st.image(
                 path,
-                use_container_width=True
+                width="stretch"
             )
 
     # ======================================
@@ -213,7 +217,7 @@ for i in range(0, len(top_charts), 2):
 
             st.image(
                 path,
-                use_container_width=True
+                width="stretch"
             )
 
     st.divider()
@@ -228,7 +232,15 @@ center_col1, center_col2, center_col3 = st.columns([1, 2, 1])
 
 with center_col2:
 
-    st.image(
-        "outputs/visualizations/job_distribution.png",
-        use_container_width=True
-    )
+    pie_chart = "outputs/visualizations/job_distribution.png"
+
+    if os.path.exists(pie_chart):
+
+        st.image(
+            pie_chart,
+            width="stretch"
+        )
+
+    else:
+
+        st.warning("Job distribution chart not available.")
