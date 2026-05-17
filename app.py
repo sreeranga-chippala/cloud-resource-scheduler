@@ -24,91 +24,83 @@ st.set_page_config(
     layout="wide"
 )
 
-# ==========================================
-# SIMPLE CLEAN CSS
-# ==========================================
-# ==========================================
-# CLEAN WHITE UI CSS
-# ==========================================
-
 st.markdown("""
 <style>
 
-/* Remove Streamlit header */
+/* MAIN BACKGROUND */
+.stApp {
+    background-color: white;
+    color: black;
+}
+
+/* REMOVE DARK TOP BAR */
 header {
     visibility: hidden;
 }
 
-/* Remove footer */
-footer {
-    visibility: hidden;
-}
-
-/* Remove hamburger menu */
 #MainMenu {
     visibility: hidden;
 }
 
-/* Full white background */
-.stApp {
-    background-color: white;
+footer {
+    visibility: hidden;
 }
 
-/* Main container */
-.block-container {
-    padding-top: 1rem;
-    padding-bottom: 2rem;
-    max-width: 1400px;
-}
-
-/* Remove dark toolbar */
+/* TOOLBAR */
 [data-testid="stToolbar"] {
     display: none;
 }
 
-/* Remove top decoration */
 [data-testid="stDecoration"] {
     display: none;
 }
 
-/* Metric cards */
+/* MAIN CONTAINER */
+.block-container {
+    padding-top: 1rem;
+    padding-bottom: 2rem;
+    max-width: 1400px;
+    background-color: white;
+}
+
+/* TEXT COLORS */
+h1, h2, h3, h4, h5, h6, p, div, span, label {
+    color: black !important;
+}
+
+/* METRIC CARDS */
 [data-testid="metric-container"] {
-    background-color: #f8f9fa;
-    border: 1px solid #e6e6e6;
+    background: #f7f7f7;
+    border: 1px solid #e5e5e5;
     padding: 15px;
-    border-radius: 10px;
+    border-radius: 12px;
+    color: black;
 }
 
-/* Dataframe */
-[data-testid="stDataFrame"] {
-    border-radius: 10px;
-}
-
-/* Buttons */
+/* BUTTON */
 .stButton > button {
-    width: 100%;
-    border-radius: 10px;
-    height: 3em;
-    font-size: 16px;
-    font-weight: 600;
     background-color: #2563eb;
     color: white;
+    border-radius: 10px;
     border: none;
+    height: 3em;
+    width: 100%;
+    font-size: 16px;
+    font-weight: 600;
 }
 
-/* Chart spacing */
+/* DATAFRAME */
+[data-testid="stDataFrame"] {
+    background-color: white;
+}
+
+/* IMAGES */
 img {
     border-radius: 10px;
 }
 
-/* Remove unnecessary padding */
-section.main > div {
-    padding-top: 0rem;
-}
-
 </style>
 """, unsafe_allow_html=True)
-
 # ==========================================
 # TITLE
 # ==========================================
