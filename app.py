@@ -1,5 +1,4 @@
 import os
-import time
 import streamlit as st
 from PIL import Image
 import pandas as pd
@@ -13,13 +12,6 @@ st.set_page_config(
     page_title="Cloud Resource Scheduler",
     layout="wide"
 )
-
-# ==========================================
-# SESSION STATE
-# ==========================================
-
-if "run_id" not in st.session_state:
-    st.session_state["run_id"] = "default"
 
 # ==========================================
 # SIDEBAR
@@ -56,21 +48,27 @@ st.divider()
 
 if st.button("Run Simulation"):
 
-    run_id = str(int(time.time()))
-
-    st.session_state["run_id"] = run_id
-
     with st.spinner("Running cloud scheduling simulation..."):
 
+        # Create directories
+        os.makedirs("builds", exist_ok=True)
+        os.makedirs("outputs/metrics", exist_ok=True)
+        os.makedirs("outputs/visualizations", exist_ok=True)
+
+        # Compile generator
         os.system("gcc input_generator.c -o builds/gen")
 
+        # Compile scheduler
         os.system("g++ -std=c++17 main.cpp -o builds/run")
 
+        # Generate workload
         os.system("./builds/gen")
 
+        # Run scheduler
         os.system("./builds/run")
 
-        generate_charts(run_id)
+        # Generate charts
+        generate_charts()
 
     st.success("Simulation completed successfully")
 
@@ -152,41 +150,45 @@ if os.path.exists(metrics_path):
     )
 
     st.divider()
+
 # ==========================================
 # VISUAL ANALYTICS
 # ==========================================
 
 st.header("Visual Analytics")
 
-run_id = st.session_state.get("run_id", "default")
-
 top_charts = [
 
     (
         "Revenue Growth",
-        f"outputs/visualizations/revenue_growth_{run_id}.png"
+        "outputs/visualizations/revenue_growth.png"
     ),
 
     (
         "Greedy Resource Utilization",
-        f"outputs/visualizations/greedy_resource_utilization_{run_id}.png"
+        "outputs/visualizations/greedy_resource_utilization.png"
     ),
 
     (
         "Online Resource Utilization",
-        f"outputs/visualizations/online_resource_utilization_{run_id}.png"
+        "outputs/visualizations/online_resource_utilization.png"
     ),
 
     (
         "Queue Pressure",
-        f"outputs/visualizations/queue_pressure_{run_id}.png"
+        "outputs/visualizations/queue_pressure.png"
     )
 ]
+
+# ==========================================
+# DISPLAY CHARTS
+# ==========================================
 
 for i in range(0, len(top_charts), 2):
 
     col1, col2 = st.columns(2)
 
+    # LEFT CHART
     with col1:
 
         title, path = top_charts[i]
@@ -202,6 +204,7 @@ for i in range(0, len(top_charts), 2):
                 use_container_width=True
             )
 
+    # RIGHT CHART
     with col2:
 
         title, path = top_charts[i + 1]
@@ -229,9 +232,7 @@ _, center_col, _ = st.columns([1, 2, 1])
 
 with center_col:
 
-    pie_path = (
-        f"outputs/visualizations/job_distribution_{run_id}.png"
-    )
+    pie_path = "outputs/visualizations/job_distribution.png"
 
     if os.path.exists(pie_path):
 
