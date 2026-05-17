@@ -10,7 +10,7 @@ import os
 # CHART GENERATOR FUNCTION
 # ============================================
 
-def generate_charts(run_id):
+def generate_charts():
 
     # ============================================
     # BASE PATHS
@@ -57,15 +57,6 @@ def generate_charts(run_id):
     )
 
     # ============================================
-    # SEABORN STYLE
-    # ============================================
-
-    sns.set_theme(
-        style="whitegrid",
-        palette="deep"
-    )
-
-    # ============================================
     # LOAD DATA
     # ============================================
 
@@ -86,187 +77,94 @@ def generate_charts(run_id):
         first = f.readline().split()
 
         MAX_CPU = int(first[0])
-
         MAX_RAM = int(first[1])
-
         MAX_STORAGE = int(first[2])
-
         MAX_BW = int(first[3])
+
+    # ============================================
+    # STYLE
+    # ============================================
+
+    sns.set_theme(
+        style="whitegrid",
+        palette="deep"
+    )
 
     # ============================================
     # NORMALIZED UTILIZATION
     # ============================================
 
-    cpu_percent = (
-        timeline["CPU"] / MAX_CPU
-    ) * 100
-
-    ram_percent = (
-        timeline["RAM"] / MAX_RAM
-    ) * 100
-
-    storage_percent = (
-        timeline["Storage"] / MAX_STORAGE
-    ) * 100
-
-    bw_percent = (
-        timeline["BW"] / MAX_BW
-    ) * 100
-
-    # ============================================
-    # MOVING AVERAGE SMOOTHING
-    # ============================================
+    cpu_percent = (timeline["CPU"] / MAX_CPU) * 100
+    ram_percent = (timeline["RAM"] / MAX_RAM) * 100
+    storage_percent = (timeline["Storage"] / MAX_STORAGE) * 100
+    bw_percent = (timeline["BW"] / MAX_BW) * 100
 
     WINDOW = 20
 
-    cpu_smooth = (
-        cpu_percent
-        .rolling(WINDOW)
-        .mean()
-    )
+    cpu_smooth = cpu_percent.rolling(WINDOW).mean()
+    ram_smooth = ram_percent.rolling(WINDOW).mean()
+    storage_smooth = storage_percent.rolling(WINDOW).mean()
+    bw_smooth = bw_percent.rolling(WINDOW).mean()
+    queue_smooth = timeline["Queue"].rolling(WINDOW).mean()
 
-    ram_smooth = (
-        ram_percent
-        .rolling(WINDOW)
-        .mean()
-    )
+    # ============================================
+    # ONLINE RESOURCE UTILIZATION
+    # ============================================
 
-    storage_smooth = (
-        storage_percent
-        .rolling(WINDOW)
-        .mean()
-    )
+    plt.figure(figsize=(14, 7))
 
-    bw_smooth = (
-        bw_percent
-        .rolling(WINDOW)
-        .mean()
-    )
+    sns.lineplot(x=timeline["Time"], y=cpu_smooth, label="CPU")
+    sns.lineplot(x=timeline["Time"], y=ram_smooth, label="RAM")
+    sns.lineplot(x=timeline["Time"], y=storage_smooth, label="Storage")
+    sns.lineplot(x=timeline["Time"], y=bw_smooth, label="Bandwidth")
 
-    queue_smooth = (
-        timeline["Queue"]
-        .rolling(WINDOW)
-        .mean()
-    )
-
-    # =========================================================
-    # 1. ONLINE RESOURCE UTILIZATION OVER TIME
-    # =========================================================
-
-    plt.figure(figsize=(14, 7), dpi=300)
-
-    sns.lineplot(
-        x=timeline["Time"],
-        y=cpu_smooth,
-        label="CPU (%)",
-        linewidth=2
-    )
-
-    sns.lineplot(
-        x=timeline["Time"],
-        y=ram_smooth,
-        label="RAM (%)",
-        linewidth=2
-    )
-
-    sns.lineplot(
-        x=timeline["Time"],
-        y=storage_smooth,
-        label="Storage (%)",
-        linewidth=2
-    )
-
-    sns.lineplot(
-        x=timeline["Time"],
-        y=bw_smooth,
-        label="Bandwidth (%)",
-        linewidth=2
-    )
-
-    plt.title(
-        "Online Scheduler Resource Utilization Over Time",
-        fontsize=16,
-        fontweight="bold"
-    )
-
-    plt.xlabel(
-        "Simulation Time Step"
-    )
-
-    plt.ylabel(
-        "Utilization (% of Cluster Capacity)"
-    )
-
-    plt.legend()
+    plt.title("Online Resource Utilization")
+    plt.xlabel("Time")
+    plt.ylabel("Utilization (%)")
 
     plt.tight_layout()
 
     plt.savefig(
         os.path.join(
             VISUAL_DIR,
-            f"online_resource_utilization_{run_id}.png"
-        ),
-        dpi=300,
-        bbox_inches="tight"
+            "online_resource_utilization.png"
+        )
     )
 
     plt.close()
 
-    # =========================================================
-    # 2. GREEDY RESOURCE UTILIZATION
-    # =========================================================
+    # ============================================
+    # GREEDY RESOURCE UTILIZATION
+    # ============================================
 
-    resources = [
-        "CPU",
-        "RAM",
-        "Storage",
-        "Bandwidth"
-    ]
-
-    greedy_values = [
-        greedy["CPU"],
-        greedy["RAM"],
-        greedy["Storage"],
-        greedy["BW"]
-    ]
-
-    plt.figure(figsize=(14, 7), dpi=300)
+    plt.figure(figsize=(10, 6))
 
     sns.barplot(
-        x=resources,
-        y=greedy_values
+        x=["CPU", "RAM", "Storage", "Bandwidth"],
+        y=[
+            greedy["CPU"],
+            greedy["RAM"],
+            greedy["Storage"],
+            greedy["BW"]
+        ]
     )
 
-    plt.title(
-        "Static Baseline Resource Utilization",
-        fontsize=16,
-        fontweight="bold"
-    )
-
-    plt.xlabel(
-        "Resources"
-    )
-
-    plt.ylabel(
-        "Utilization (% of Capacity)"
-    )
+    plt.title("Greedy Resource Utilization")
 
     plt.tight_layout()
 
     plt.savefig(
         os.path.join(
             VISUAL_DIR,
-            f"greedy_resource_utilization_{run_id}.png"
-        ),
-        dpi=300,
-        bbox_inches="tight"
+            "greedy_resource_utilization.png"
+        )
     )
 
     plt.close()
 
-    # =========================================================
-    # 3. REVENUE GENERATION RATE
-    # =========================================================
+    # ============================================
+    # REVENUE GROWTH
+    # ============================================
 
     revenue_rate = (
         timeline["Revenue"]
@@ -276,133 +174,83 @@ def generate_charts(run_id):
 
     revenue_rate_smooth = (
         revenue_rate
-        .rolling(20)
+        .rolling(WINDOW)
         .mean()
     )
 
-    plt.figure(figsize=(14, 7), dpi=300)
+    plt.figure(figsize=(14, 7))
 
     sns.lineplot(
         x=timeline["Time"],
-        y=revenue_rate_smooth,
-        linewidth=2
+        y=revenue_rate_smooth
     )
 
-    plt.title(
-        "Revenue Generation Rate Over Time",
-        fontsize=16,
-        fontweight="bold"
-    )
-
-    plt.xlabel(
-        "Simulation Time Step"
-    )
-
-    plt.ylabel(
-        "Revenue Generated ($ per event)"
-    )
+    plt.title("Revenue Growth")
 
     plt.tight_layout()
 
     plt.savefig(
         os.path.join(
             VISUAL_DIR,
-            f"revenue_growth_{run_id}.png"
-        ),
-        dpi=300,
-        bbox_inches="tight"
+            "revenue_growth.png"
+        )
     )
 
     plt.close()
 
-    # =========================================================
-    # 4. QUEUE PRESSURE ANALYSIS
-    # =========================================================
+    # ============================================
+    # QUEUE PRESSURE
+    # ============================================
 
-    plt.figure(figsize=(14, 7), dpi=300)
+    plt.figure(figsize=(14, 7))
 
     sns.lineplot(
         x=timeline["Time"],
-        y=queue_smooth,
-        linewidth=2
+        y=queue_smooth
     )
 
-    plt.title(
-        "Scheduler Congestion Over Time",
-        fontsize=16,
-        fontweight="bold"
-    )
-
-    plt.xlabel(
-        "Simulation Time Step"
-    )
-
-    plt.ylabel(
-        "Queued Jobs"
-    )
+    plt.title("Queue Pressure")
 
     plt.tight_layout()
 
     plt.savefig(
         os.path.join(
             VISUAL_DIR,
-            f"queue_pressure_{run_id}.png"
-        ),
-        dpi=300,
-        bbox_inches="tight"
+            "queue_pressure.png"
+        )
     )
 
     plt.close()
 
-    # =========================================================
-    # 5. ONLINE DISTRIBUTION PIE CHART
-    # =========================================================
+    # ============================================
+    # JOB DISTRIBUTION PIE CHART
+    # ============================================
 
-    plt.figure(figsize=(8, 8), dpi=300)
-
-    sizes = [
-        online["Accepted"],
-        online["Rejected"]
-    ]
-
-    labels = [
-        "Accepted",
-        "Rejected"
-    ]
-
-    colors = sns.color_palette("deep")
+    plt.figure(figsize=(8, 8))
 
     plt.pie(
-        sizes,
-        labels=labels,
-        autopct='%1.1f%%',
-        startangle=90,
-        colors=colors
+        [online["Accepted"], online["Rejected"]],
+        labels=["Accepted", "Rejected"],
+        autopct="%1.1f%%"
     )
 
-    plt.title(
-        "Online Scheduler Job Distribution",
-        fontsize=16,
-        fontweight="bold"
-    )
+    plt.title("Job Distribution")
 
     plt.tight_layout()
 
     plt.savefig(
         os.path.join(
             VISUAL_DIR,
-            f"job_distribution_{run_id}.png"
-        ),
-        dpi=300,
-        bbox_inches="tight"
+            "job_distribution.png"
+        )
     )
 
     plt.close()
 
 # ============================================
-# DIRECT EXECUTION SUPPORT
+# DIRECT EXECUTION
 # ============================================
 
 if __name__ == "__main__":
 
-    generate_charts("manual")
+    generate_charts()
