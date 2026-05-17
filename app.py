@@ -34,6 +34,40 @@ header {
 </style>
 """
 
+custom_css = """
+<style>
+
+.stApp {
+    background: linear-gradient(
+        to bottom right,
+        #0f172a,
+        #111827,
+        #1e293b
+    );
+    color: white;
+}
+
+[data-testid="stMetric"] {
+    background-color: #1e293b;
+    border: 1px solid #334155;
+    padding: 15px;
+    border-radius: 15px;
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.3);
+}
+
+h1, h2, h3 {
+    color: #60a5fa;
+}
+
+section[data-testid="stSidebar"] {
+    background-color: #111827;
+}
+
+</style>
+"""
+
+st.markdown(custom_css, unsafe_allow_html=True)
+
 st.markdown(
     hide_streamlit_style,
     unsafe_allow_html=True
