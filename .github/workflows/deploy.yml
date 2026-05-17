@@ -23,12 +23,19 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
 
           script: |
+
             cd ~/cloud-resource-scheduler
+
+            git pull origin main
 
             source venv/bin/activate
 
             rm -f outputs/metrics/*.csv
             rm -f outputs/visualizations/*.png
+
+            mkdir -p builds
+            mkdir -p outputs/metrics
+            mkdir -p outputs/visualizations
 
             gcc input_generator.c -o builds/gen
 
