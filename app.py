@@ -17,93 +17,183 @@ st.set_page_config(
 # ==========================================
 # CUSTOM CSS
 # ==========================================
-
 st.markdown("""
 <style>
 
 .stApp {
-    background-color: #020817;
+
+    background-image: url("https://images.unsplash.com/photo-1451187580459-43490279c0fa");
+
+    background-size: cover;
+
+    background-attachment: fixed;
+
+    background-position: center;
+
     color: white;
 }
 
-section[data-testid="stSidebar"] {
-    background-color: #0f172a;
-    border-right: 1px solid #1e293b;
+/* overlay */
+
+.stApp::before {
+
+    content: "";
+
+    position: fixed;
+
+    top: 0;
+
+    left: 0;
+
+    width: 100%;
+
+    height: 100%;
+
+    background: rgba(0, 0, 0, 0.72);
+
+    z-index: -1;
 }
 
-.block-container {
-    padding-top: 2rem;
-    padding-bottom: 2rem;
+/* sidebar */
+
+section[data-testid="stSidebar"] {
+
+    background: rgba(15, 23, 42, 0.85);
+
+    backdrop-filter: blur(14px);
+
+    border-right: 1px solid rgba(255,255,255,0.08);
 }
+
+/* cards */
 
 .metric-card {
-    background: #0f172a;
-    border: 1px solid #1e293b;
-    padding: 20px;
-    border-radius: 18px;
-    text-align: center;
-    transition: 0.3s;
+
+    background: rgba(255,255,255,0.08);
+
+    backdrop-filter: blur(14px);
+
+    border: 1px solid rgba(255,255,255,0.1);
+
+    border-radius: 20px;
+
+    padding: 24px;
+
+    transition: 0.3s ease;
+
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
 }
 
 .metric-card:hover {
-    border: 1px solid #3b82f6;
-    transform: translateY(-2px);
+
+    transform: translateY(-5px);
+
+    border: 1px solid #60a5fa;
+
+    box-shadow: 0 15px 40px rgba(59,130,246,0.3);
 }
 
+/* metric title */
+
 .metric-title {
-    color: #94a3b8;
+
+    color: #cbd5e1;
+
     font-size: 15px;
+
     margin-bottom: 10px;
 }
 
+/* metric value */
+
 .metric-value {
+
     color: white;
-    font-size: 32px;
+
+    font-size: 34px;
+
     font-weight: bold;
 }
 
+/* charts */
+
 .chart-container {
-    background: #0f172a;
-    border: 1px solid #1e293b;
-    padding: 15px;
-    border-radius: 18px;
+
+    background: rgba(255,255,255,0.06);
+
+    backdrop-filter: blur(12px);
+
+    border-radius: 20px;
+
+    padding: 20px;
+
+    border: 1px solid rgba(255,255,255,0.08);
+
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
 }
 
-h1, h2, h3 {
+/* text */
+
+h1 {
+
+    font-size: 48px !important;
+
+    font-weight: 800 !important;
+
     color: white !important;
 }
 
+h2, h3 {
+
+    color: white !important;
+}
+
+/* hide streamlit */
+
 #MainMenu {
+
     visibility: hidden;
 }
 
 footer {
+
     visibility: hidden;
 }
 
 header {
+
     visibility: hidden;
 }
 
 </style>
 """, unsafe_allow_html=True)
-
 # ==========================================
 # SIDEBAR
 # ==========================================
 
 st.sidebar.title("☁️ Cloud Scheduler")
+st.markdown("""
+<div style="
+padding:40px;
+border-radius:25px;
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(14px);
+margin-bottom:30px;
+">
 
-st.sidebar.markdown("""
-### Features
+<h1 style="margin-bottom:10px;">
+☁️ AI Cloud Resource Scheduler
+</h1>
 
-- Online Scheduling
-- Greedy Scheduling
-- Runtime Analytics
-- AWS EC2 Deployment
-- GitHub Actions CI/CD
-- Real-Time Monitoring
-""")
+<p style="
+font-size:20px;
+color:#cbd5e1;
+">
+Real-Time Infrastructure Monitoring and Intelligent Cloud Scheduling Platform
+</p>
+
+</div>
+""", unsafe_allow_html=True)
 
 # ==========================================
 # HEADER
