@@ -1,4 +1,5 @@
 import os
+import time
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
@@ -9,7 +10,7 @@ import plotly.express as px
 # ==========================================
 
 st.set_page_config(
-    page_title="AI Cloud Resource Scheduler",
+    page_title="Cloud Resource Scheduler",
     page_icon="☁️",
     layout="wide"
 )
@@ -21,191 +22,189 @@ st.set_page_config(
 st.markdown("""
 <style>
 
-html, body, [class*="css"] {
-    font-family: 'Inter', sans-serif;
-}
-
-/* MAIN APP */
+/* =========================
+MAIN BACKGROUND
+========================= */
 
 .stApp {
 
-    background-image:
-    linear-gradient(
-        rgba(5,10,20,0.80),
-        rgba(5,10,20,0.85)
-    ),
-    url("https://images.unsplash.com/photo-1462331940025-496dfbfc7564");
-
-    background-size: cover;
-
-    background-position: center;
-
-    background-attachment: fixed;
-
+    background: #0f172a;
     color: white;
 }
 
-/* MAIN CONTAINER */
+/* =========================
+REMOVE STREAMLIT BRANDING
+========================= */
 
-.block-container {
-
-    max-width: 1450px;
-
-    padding-top: 2rem;
-
-    padding-bottom: 2rem;
+#MainMenu {
+    visibility: hidden;
 }
 
-/* HERO SECTION */
-
-.hero {
-
-    padding: 55px;
-
-    border-radius: 30px;
-
-    background: rgba(15,23,42,0.72);
-
-    backdrop-filter: blur(16px);
-
-    border: 1px solid rgba(255,255,255,0.08);
-
-    margin-bottom: 40px;
-
-    box-shadow: 0 10px 40px rgba(0,0,0,0.35);
+footer {
+    visibility: hidden;
 }
 
-/* METRIC CARDS */
+header {
+    visibility: hidden;
+}
+
+/* =========================
+TOP HEADER
+========================= */
+
+.main-title {
+
+    font-size: 52px;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 10px;
+}
+
+.sub-title {
+
+    font-size: 20px;
+    color: #cbd5e1;
+    margin-bottom: 25px;
+}
+
+/* =========================
+GLASS CARDS
+========================= */
 
 .metric-card {
 
-    background: rgba(15,23,42,0.78);
+    background: linear-gradient(
+        145deg,
+        rgba(30,41,59,0.95),
+        rgba(15,23,42,0.95)
+    );
 
-    border-radius: 24px;
+    border: 1px solid rgba(255,255,255,0.08);
 
-    padding: 30px;
+    border-radius: 22px;
 
-    border: 1px solid rgba(255,255,255,0.06);
+    padding: 24px;
 
-    backdrop-filter: blur(12px);
+    box-shadow:
+        0 8px 25px rgba(0,0,0,0.35);
 
-    min-height: 150px;
-
-    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-
-    transition: 0.3s;
+    transition: 0.3s ease;
 }
 
 .metric-card:hover {
 
-    transform: translateY(-6px);
+    transform: translateY(-4px);
 
     border: 1px solid #3b82f6;
 }
 
+/* =========================
+METRIC TEXT
+========================= */
+
 .metric-title {
 
-    color: #cbd5e1;
-
-    font-size: 18px;
-
-    margin-bottom: 15px;
+    font-size: 16px;
+    color: #94a3b8;
+    margin-bottom: 12px;
 }
 
 .metric-value {
 
-    font-size: 38px;
-
-    font-weight: 800;
-
+    font-size: 36px;
+    font-weight: 700;
     color: white;
 }
 
-/* CHART CONTAINER */
+/* =========================
+SECTION HEADERS
+========================= */
 
-.chart-container {
+.section-title {
 
-    background: rgba(15,23,42,0.82);
+    font-size: 34px;
+    font-weight: 700;
+    color: white;
+    margin-top: 25px;
+    margin-bottom: 20px;
+}
+
+/* =========================
+CHART CONTAINERS
+========================= */
+
+.chart-card {
+
+    background: rgba(15,23,42,0.96);
 
     border-radius: 24px;
 
-    padding: 25px;
+    padding: 18px;
 
-    margin-bottom: 35px;
+    border: 1px solid rgba(255,255,255,0.08);
 
-    border: 1px solid rgba(255,255,255,0.06);
-
-    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    margin-bottom: 20px;
 }
 
-/* SIDEBAR */
-
-section[data-testid="stSidebar"] {
-
-    background: rgba(15,23,42,0.94);
-
-    border-right: 1px solid rgba(255,255,255,0.05);
-}
-
-/* TITLES */
-
-h1 {
-
-    font-size: 58px !important;
-
-    font-weight: 800 !important;
-
-    color: white !important;
-}
-
-h2, h3 {
-
-    color: white !important;
-}
-
-/* BUTTON */
+/* =========================
+BUTTONS
+========================= */
 
 .stButton>button {
 
     background: linear-gradient(
-        135deg,
+        90deg,
         #2563eb,
-        #1d4ed8
+        #3b82f6
     );
 
     color: white;
-
-    border-radius: 14px;
-
-    border: none;
-
-    padding: 14px 26px;
 
     font-size: 18px;
 
     font-weight: 600;
 
-    transition: 0.3s;
+    border-radius: 14px;
 
-    box-shadow: 0 8px 20px rgba(37,99,235,0.35);
+    border: none;
+
+    padding: 12px 28px;
+
+    transition: 0.3s ease;
 }
 
 .stButton>button:hover {
 
-    transform: translateY(-2px);
+    transform: scale(1.03);
 
     background: linear-gradient(
-        135deg,
-        #3b82f6,
+        90deg,
+        #1d4ed8,
         #2563eb
     );
 }
 
-/* REMOVE STREAMLIT */
+/* =========================
+DATAFRAME
+========================= */
 
-#MainMenu {visibility:hidden;}
-footer {visibility:hidden;}
-header {visibility:hidden;}
+[data-testid="stDataFrame"] {
+
+    border-radius: 20px;
+
+    overflow: hidden;
+
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+/* =========================
+SIDEBAR
+========================= */
+
+section[data-testid="stSidebar"] {
+
+    background: #111827;
+}
 
 </style>
 """, unsafe_allow_html=True)
@@ -219,69 +218,39 @@ st.sidebar.title("☁️ Cloud Scheduler")
 st.sidebar.markdown("""
 ### Features
 
-- AI Resource Scheduling
+- Static Greedy Packing
+- Online Event Scheduling
+- Resource Optimization
+- Queue Management
+- Aging-Based Priority
 - Runtime Analytics
-- Queue Optimization
-- AWS EC2 Deployment
+- AWS Cloud Deployment
 - CI/CD Automation
-- Cloud Monitoring
 """)
 
 # ==========================================
-# HERO SECTION
+# HEADER
 # ==========================================
 
 st.markdown("""
-<div class="hero">
-
-<div style="
-font-size:62px;
-font-weight:800;
-margin-bottom:15px;
-">
-☁️ AI Cloud Resource Scheduler
+<div class="main-title">
+☁️ Cloud Resource Scheduler
 </div>
 
-<div style="
-font-size:24px;
-color:#cbd5e1;
-line-height:1.7;
-max-width:1000px;
-">
-Real-Time Cloud Infrastructure Monitoring,
-Intelligent Scheduling,
-Revenue Analytics,
-Queue Optimization,
-and AI-Based Resource Allocation Platform deployed on AWS EC2 with CI/CD automation.
-</div>
-
+<div class="sub-title">
+Dynamic Resource Allocation and Online Scheduling Simulator
 </div>
 """, unsafe_allow_html=True)
-
-# ==========================================
-# STATUS BAR
-# ==========================================
-
-col1, col2, col3 = st.columns(3)
-
-with col1:
-    st.success("🟢 AWS EC2 Active")
-
-with col2:
-    st.info("⚡ GitHub Actions Connected")
-
-with col3:
-    st.warning("☁️ Cloud Deployment Enabled")
 
 st.divider()
 
 # ==========================================
-# RUN BUTTON
+# RUN SIMULATION
 # ==========================================
 
 if st.button("🚀 Run Simulation"):
 
-    with st.spinner("Running cloud scheduling simulation..."):
+    with st.spinner("Running scheduling simulation..."):
 
         os.system("gcc input_generator.c -o builds/gen")
 
@@ -303,62 +272,91 @@ timeline_path = "outputs/metrics/timeline.csv"
 if os.path.exists(metrics_path) and os.path.exists(timeline_path):
 
     metrics = pd.read_csv(metrics_path)
-
     timeline = pd.read_csv(timeline_path)
 
     online = metrics.iloc[1]
 
     # ======================================
-    # METRICS
+    # KPI SECTION
     # ======================================
 
-    st.subheader("📊 System Metrics")
+    st.markdown(
+        '<div class="section-title">📊 System Metrics</div>',
+        unsafe_allow_html=True
+    )
 
-    cols = st.columns(4)
+    c1, c2, c3, c4 = st.columns(4)
 
-    metric_data = [
+    cards = [
 
-        ("💰 Revenue", f"${int(online['Revenue'])}"),
+        ("💰 Revenue",
+         f"${int(online['Revenue'])}"),
 
-        ("✅ Accepted Jobs", int(online["Accepted"])),
+        ("✅ Accepted Jobs",
+         int(online["Accepted"])),
 
-        ("❌ Rejected Jobs", int(online["Rejected"])),
+        ("❌ Rejected Jobs",
+         int(online["Rejected"])),
 
-        ("🖥️ CPU Usage", f"{online['CPU']:.2f}%")
+        ("🖥️ CPU Utilization",
+         f"{online['CPU']:.2f}%")
     ]
 
-    for col, (title, value) in zip(cols, metric_data):
+    for col, (title, value) in zip(
+        [c1, c2, c3, c4],
+        cards
+    ):
 
         with col:
 
             st.markdown(f"""
             <div class="metric-card">
-                <div class="metric-title">{title}</div>
-                <div class="metric-value">{value}</div>
+
+                <div class="metric-title">
+                    {title}
+                </div>
+
+                <div class="metric-value">
+                    {value}
+                </div>
+
             </div>
             """, unsafe_allow_html=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    cols2 = st.columns(3)
+    c5, c6, c7 = st.columns(3)
 
-    metric_data2 = [
+    more_cards = [
 
-        ("💾 Storage", f"{online['Storage']:.2f}%"),
+        ("💾 Storage",
+         f"{online['Storage']:.2f}%"),
 
-        ("🧠 RAM", f"{online['RAM']:.2f}%"),
+        ("🧠 RAM",
+         f"{online['RAM']:.2f}%"),
 
-        ("📡 Bandwidth", f"{online['BW']:.2f}%")
+        ("📡 Bandwidth",
+         f"{online['BW']:.2f}%")
     ]
 
-    for col, (title, value) in zip(cols2, metric_data2):
+    for col, (title, value) in zip(
+        [c5, c6, c7],
+        more_cards
+    ):
 
         with col:
 
             st.markdown(f"""
             <div class="metric-card">
-                <div class="metric-title">{title}</div>
-                <div class="metric-value">{value}</div>
+
+                <div class="metric-title">
+                    {title}
+                </div>
+
+                <div class="metric-value">
+                    {value}
+                </div>
+
             </div>
             """, unsafe_allow_html=True)
 
@@ -368,221 +366,255 @@ if os.path.exists(metrics_path) and os.path.exists(timeline_path):
     # RESOURCE UTILIZATION
     # ======================================
 
-    st.subheader("📈 Resource Utilization")
+    st.markdown(
+        '<div class="section-title">📈 Resource Utilization</div>',
+        unsafe_allow_html=True
+    )
 
-    fig1 = go.Figure()
+    fig = go.Figure()
 
-    fig1.add_trace(go.Scatter(
-        x=timeline["Time"],
-        y=timeline["CPU"],
-        mode="lines",
-        name="CPU",
-        line=dict(color="#3b82f6", width=3)
-    ))
-
-    fig1.add_trace(go.Scatter(
-        x=timeline["Time"],
-        y=timeline["RAM"],
-        mode="lines",
-        name="RAM",
-        line=dict(color="#10b981", width=3)
-    ))
-
-    fig1.add_trace(go.Scatter(
-        x=timeline["Time"],
-        y=timeline["Storage"],
-        mode="lines",
-        name="Storage",
-        line=dict(color="#f59e0b", width=3)
-    ))
-
-    fig1.add_trace(go.Scatter(
-        x=timeline["Time"],
-        y=timeline["BW"],
-        mode="lines",
-        name="Bandwidth",
-        line=dict(color="#ef4444", width=3)
-    ))
-
-    fig1.update_layout(
-
-        template="plotly",
-
-        paper_bgcolor="rgba(0,0,0,0)",
-
-        plot_bgcolor="rgba(0,0,0,0)",
-
-        font=dict(color="white"),
-
-        height=420,
-
-        margin=dict(l=20, r=20, t=40, b=20),
-
-        xaxis=dict(
-            gridcolor="rgba(255,255,255,0.08)"
-        ),
-
-        yaxis=dict(
-            gridcolor="rgba(255,255,255,0.08)"
+    fig.add_trace(
+        go.Scatter(
+            x=timeline["Time"],
+            y=timeline["CPU"],
+            mode="lines",
+            name="CPU",
+            line=dict(color="#3b82f6", width=3)
         )
     )
 
-    st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-
-    st.plotly_chart(
-        fig1,
-        use_container_width=True,
-        config={"displayModeBar": False}
+    fig.add_trace(
+        go.Scatter(
+            x=timeline["Time"],
+            y=timeline["RAM"],
+            mode="lines",
+            name="RAM",
+            line=dict(color="#10b981", width=3)
+        )
     )
 
-    st.markdown('</div>', unsafe_allow_html=True)
+    fig.add_trace(
+        go.Scatter(
+            x=timeline["Time"],
+            y=timeline["Storage"],
+            mode="lines",
+            name="Storage",
+            line=dict(color="#f59e0b", width=3)
+        )
+    )
+
+    fig.add_trace(
+        go.Scatter(
+            x=timeline["Time"],
+            y=timeline["BW"],
+            mode="lines",
+            name="Bandwidth",
+            line=dict(color="#ef4444", width=3)
+        )
+    )
+
+    fig.update_layout(
+
+        paper_bgcolor="#0f172a",
+
+        plot_bgcolor="#0f172a",
+
+        font=dict(color="white"),
+
+        height=520,
+
+        margin=dict(
+            l=20,
+            r=20,
+            t=40,
+            b=20
+        ),
+
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
+        )
+    )
+
+    st.plotly_chart(
+        fig,
+        use_container_width=True,
+        config={"displaylogo": False}
+    )
+
+    st.divider()
 
     # ======================================
     # REVENUE + QUEUE
     # ======================================
 
-    colA, colB = st.columns(2)
+    left, right = st.columns(2)
 
-    with colA:
+    # ======================================
+    # REVENUE
+    # ======================================
 
-        st.subheader("💰 Revenue Growth")
+    with left:
 
-        fig2 = px.line(
-            timeline,
-            x="Time",
-            y="Revenue"
+        st.markdown(
+            '<div class="section-title">💰 Revenue Growth</div>',
+            unsafe_allow_html=True
         )
 
-        fig2.update_traces(
-            line=dict(color="#3b82f6", width=3)
+        fig2 = go.Figure()
+
+        fig2.add_trace(
+
+            go.Scatter(
+                x=timeline["Time"],
+                y=timeline["Revenue"],
+                mode="lines",
+                line=dict(
+                    color="#3b82f6",
+                    width=3
+                ),
+                fill='tozeroy'
+            )
         )
 
         fig2.update_layout(
 
-            template="plotly",
+            paper_bgcolor="#0f172a",
 
-            paper_bgcolor="rgba(0,0,0,0)",
-
-            plot_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="#0f172a",
 
             font=dict(color="white"),
 
-            height=350,
+            height=420,
 
-            margin=dict(l=20, r=20, t=40, b=20)
+            margin=dict(
+                l=20,
+                r=20,
+                t=30,
+                b=20
+            )
         )
-
-        st.markdown('<div class="chart-container">', unsafe_allow_html=True)
 
         st.plotly_chart(
             fig2,
             use_container_width=True,
-            config={"displayModeBar": False}
+            config={"displaylogo": False}
         )
 
-        st.markdown('</div>', unsafe_allow_html=True)
+    # ======================================
+    # QUEUE
+    # ======================================
 
-    with colB:
+    with right:
 
-        st.subheader("⏳ Queue Pressure")
-
-        fig3 = px.line(
-            timeline,
-            x="Time",
-            y="Queue"
+        st.markdown(
+            '<div class="section-title">⏳ Queue Pressure</div>',
+            unsafe_allow_html=True
         )
 
-        fig3.update_traces(
-            line=dict(color="#ef4444", width=3)
+        fig3 = go.Figure()
+
+        fig3.add_trace(
+
+            go.Scatter(
+                x=timeline["Time"],
+                y=timeline["Queue"],
+                mode="lines",
+                line=dict(
+                    color="#ef4444",
+                    width=3
+                ),
+                fill='tozeroy'
+            )
         )
 
         fig3.update_layout(
 
-            template="plotly",
+            paper_bgcolor="#0f172a",
 
-            paper_bgcolor="rgba(0,0,0,0)",
-
-            plot_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="#0f172a",
 
             font=dict(color="white"),
 
-            height=350,
+            height=420,
 
-            margin=dict(l=20, r=20, t=40, b=20)
+            margin=dict(
+                l=20,
+                r=20,
+                t=30,
+                b=20
+            )
         )
-
-        st.markdown('<div class="chart-container">', unsafe_allow_html=True)
 
         st.plotly_chart(
             fig3,
             use_container_width=True,
-            config={"displayModeBar": False}
+            config={"displaylogo": False}
         )
 
-        st.markdown('</div>', unsafe_allow_html=True)
+    st.divider()
 
     # ======================================
-    # PIE CHART
+    # JOB DISTRIBUTION
     # ======================================
 
-    st.subheader("🧩 Job Distribution")
+    st.markdown(
+        '<div class="section-title">🧩 Job Distribution</div>',
+        unsafe_allow_html=True
+    )
 
-    pie_data = pd.DataFrame({
+    pie = px.pie(
 
-        "Status": ["Accepted", "Rejected"],
-
-        "Count": [
+        values=[
             online["Accepted"],
             online["Rejected"]
+        ],
+
+        names=[
+            "Accepted",
+            "Rejected"
+        ],
+
+        hole=0.55,
+
+        color_discrete_sequence=[
+            "#10b981",
+            "#ef4444"
         ]
-    })
-
-    fig4 = px.pie(
-        pie_data,
-        names="Status",
-        values="Count",
-        hole=0.45,
-        color_discrete_sequence=["#10b981", "#ef4444"]
     )
 
-    fig4.update_traces(
-        textfont_size=18
-    )
+    pie.update_layout(
 
-    fig4.update_layout(
+        paper_bgcolor="#0f172a",
 
-        template="plotly",
-
-        paper_bgcolor="rgba(0,0,0,0)",
-
-        plot_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="#0f172a",
 
         font=dict(color="white"),
 
-        height=450,
-
-        margin=dict(l=20, r=20, t=40, b=20)
+        height=500
     )
-
-    st.markdown('<div class="chart-container">', unsafe_allow_html=True)
 
     st.plotly_chart(
-        fig4,
+        pie,
         use_container_width=True,
-        config={"displayModeBar": False}
+        config={"displaylogo": False}
     )
 
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.divider()
 
     # ======================================
     # TABLE
     # ======================================
 
-    st.divider()
+    st.markdown(
+        '<div class="section-title">🗂️ Detailed Metrics</div>',
+        unsafe_allow_html=True
+    )
 
-    with st.expander("🗂️ View Detailed Metrics"):
-
-        st.dataframe(
-            metrics,
-            use_container_width=True
-        )
+    st.dataframe(
+        metrics,
+        width="stretch"
+    )
