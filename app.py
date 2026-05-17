@@ -58,14 +58,16 @@ if st.button("Run Simulation"):
         os.system("./builds/gen")
         os.system("./builds/run")
 
+        # Use timestamp as run_id — matches what charts.py saves
+        run_id = str(int(time.time()))
+
         try:
-            generate_charts()
+            generate_charts(run_id)
         except Exception as e:
             st.error(f"Chart generation failed: {e}")
             st.stop()
 
-        # Store timestamp so image loader knows to bust cache
-        st.session_state["sim_ts"] = time.time()
+        st.session_state["run_id"] = run_id
 
     st.success("Simulation completed successfully")
     st.rerun()
@@ -77,7 +79,6 @@ if st.button("Run Simulation"):
 metrics_path = os.path.join(APP_DIR, "outputs", "metrics", "metrics.csv")
 
 if os.path.exists(metrics_path):
-    # Re-read fresh from disk every time (no caching)
     metrics = pd.read_csv(metrics_path)
     online = metrics.iloc[1]
 
@@ -116,33 +117,50 @@ st.header("Visual Analytics")
 VIZ = os.path.join(APP_DIR, "outputs", "visualizations")
 
 def load_image(path):
-    """Force fresh read from disk, bypassing any Streamlit cache."""
     with open(path, "rb") as f:
         return f.read()
 
+# Use the run_id from this session, else fall back to latest file on disk
+run_id = st.session_state.get("run_id", None)
+
+def get_path(base_name):
+    """Return timestamped path if available, else fall back to any match."""
+    if run_id:
+        p = os.path.join(VIZ, f"{base_name}_{run_id}.png")
+        if os.path.exists(p):
+            return p
+    # Fallback: find the most recently modified matching file
+    candidates = [
+        os.path.join(VIZ, f) for f in os.listdir(VIZ)
+        if f.startswith(base_name) and f.endswith(".png")
+    ]
+    if candidates:
+        return max(candidates, key=os.path.getmtime)
+    return None
+
 top_charts = [
-    ("Revenue Growth",              "revenue_growth.png"),
-    ("Greedy Resource Utilization", "greedy_resource_utilization.png"),
-    ("Online Resource Utilization", "online_resource_utilization.png"),
-    ("Queue Pressure",              "queue_pressure.png"),
+    ("Revenue Growth",              "revenue_growth"),
+    ("Greedy Resource Utilization", "greedy_resource_utilization"),
+    ("Online Resource Utilization", "online_resource_utilization"),
+    ("Queue Pressure",              "queue_pressure"),
 ]
 
 for i in range(0, len(top_charts), 2):
     col1, col2 = st.columns(2)
 
     with col1:
-        title, fname = top_charts[i]
-        path = os.path.join(VIZ, fname)
-        if os.path.exists(path):
+        title, base = top_charts[i]
+        path = get_path(base)
+        if path:
             st.subheader(title)
             st.image(load_image(path), use_container_width=True)
         else:
             st.warning(f"{title} not available.")
 
     with col2:
-        title, fname = top_charts[i + 1]
-        path = os.path.join(VIZ, fname)
-        if os.path.exists(path):
+        title, base = top_charts[i + 1]
+        path = get_path(base)
+        if path:
             st.subheader(title)
             st.image(load_image(path), use_container_width=True)
         else:
@@ -155,8 +173,8 @@ st.subheader("Job Distribution")
 _, center_col, _ = st.columns([1, 2, 1])
 
 with center_col:
-    pie_path = os.path.join(VIZ, "job_distribution.png")
-    if os.path.exists(pie_path):
-        st.image(load_image(pie_path), use_container_width=True)
+    path = get_path("job_distribution")
+    if path:
+        st.image(load_image(path), use_container_width=True)
     else:
         st.warning("Job distribution chart not available.")
