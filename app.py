@@ -4,40 +4,6 @@ from PIL import Image
 import pandas as pd
 from charts import generate_charts
 
-hide_streamlit_style = """
-<style>
-
-#MainMenu {
-    visibility: hidden;
-}
-
-footer {
-    visibility: hidden;
-}
-
-header {
-    visibility: hidden;
-}
-
-[data-testid="stToolbar"] {
-    display: none;
-}
-
-[data-testid="stDecoration"] {
-    display: none;
-}
-
-[data-testid="stStatusWidget"] {
-    visibility: hidden;
-}
-
-</style>
-"""
-
-st.markdown(
-    hide_streamlit_style,
-    unsafe_allow_html=True
-)
 # ==========================================
 # PAGE CONFIG
 # ==========================================
