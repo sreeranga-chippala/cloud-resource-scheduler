@@ -3,8 +3,19 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import seaborn as sns
-import numpy as np
+import os
 
+matplotlib.use("Agg")
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+VISUAL_DIR = os.path.join(
+    BASE_DIR,
+    "outputs",
+    "visualizations"
+)
+
+os.makedirs(VISUAL_DIR, exist_ok=True)
 # ============================================
 # SEABORN STYLE
 # ============================================
@@ -148,12 +159,15 @@ plt.ylabel(
 
 plt.legend()
 plt.tight_layout()
+
 plt.savefig(
-    "outputs/visualizations/online_resource_utilization.png",
-    dpi = 300,
+    os.path.join(
+        VISUAL_DIR,
+        "online_resource_utilization.png"
+    ),
+    dpi=300,
     bbox_inches="tight"
 )
-
 plt.close()
 
 # =========================================================
@@ -195,12 +209,15 @@ plt.ylabel(
     "Utilization (% of Capacity)"
 )
 plt.tight_layout()
+
 plt.savefig(
-    "outputs/visualizations/greedy_resource_utilization.png",
-    dpi = 300,
+    os.path.join(
+        VISUAL_DIR,
+        "greedy_resource_utilization.png"
+    ),
+    dpi=300,
     bbox_inches="tight"
 )
-
 plt.close()
 # =========================================================
 # 3. REVENUE GENERATION RATE
@@ -244,9 +261,13 @@ plt.ylabel(
     "Revenue Generated ($ per event)"
 )
 plt.tight_layout()
+
 plt.savefig(
-    "outputs/visualizations/revenue_growth.png",
-    dpi = 300,
+    os.path.join(
+        VISUAL_DIR,
+        "revenue_growth.png"
+    ),
+    dpi=300,
     bbox_inches="tight"
 )
 
@@ -277,9 +298,13 @@ plt.ylabel(
     "Queued Jobs"
 )
 plt.tight_layout()
+
 plt.savefig(
-    "outputs/visualizations/queue_pressure.png",
-    dpi = 300,
+    os.path.join(
+        VISUAL_DIR,
+        "queue_pressure.png"
+    ),
+    dpi=300,
     bbox_inches="tight"
 )
 
@@ -317,9 +342,11 @@ plt.title(
 )
 
 plt.tight_layout()
-
 plt.savefig(
-    "outputs/visualizations/job_distribution.png",
+    os.path.join(
+        VISUAL_DIR,
+        "job_distribution.png"
+    ),
     dpi=300,
     bbox_inches="tight"
 )
