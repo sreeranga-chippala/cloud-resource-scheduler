@@ -36,7 +36,7 @@ st.set_page_config(
 st.markdown("""
 <style>
 
-/* Hide Streamlit UI */
+/* Hide Streamlit default UI */
 
 #MainMenu {
     visibility: hidden;
@@ -54,50 +54,50 @@ header {
     visibility: hidden;
 }
 
-/* Main App */
+/* App background */
 
 .stApp {
-    background-color: #ffffff;
+    background-color: white;
 }
 
-/* Padding */
+/* Main padding */
 
 .block-container {
     padding-top: 2rem;
     padding-bottom: 2rem;
 }
 
-/* Titles */
+/* General text */
 
 h1, h2, h3, h4, p, label {
     color: #111827 !important;
 }
 
-/* Metric Cards */
+/* Metric cards */
 
 [data-testid="stMetric"] {
 
     background-color: #f8fafc;
 
-    border: 1px solid #dbeafe;
+    border: 1px solid #e2e8f0;
 
     border-radius: 12px;
 
-    padding: 18px;
+    padding: 16px;
 }
 
-/* Metric Labels */
+/* Metric labels */
 
 [data-testid="stMetricLabel"] {
 
-    color: #475569 !important;
+    color: #64748b !important;
 
     font-size: 14px !important;
 
     font-weight: 600 !important;
 }
 
-/* Metric Values */
+/* Metric values */
 
 [data-testid="stMetricValue"] {
 
@@ -117,7 +117,7 @@ h1, h2, h3, h4, p, label {
     border-radius: 10px;
 }
 
-/* Buttons */
+/* Button */
 
 .stButton > button {
 
@@ -136,7 +136,7 @@ h1, h2, h3, h4, p, label {
     font-weight: 600;
 }
 
-/* Button Hover */
+/* Button hover */
 
 .stButton > button:hover {
 
@@ -219,7 +219,17 @@ if st.button("Run Simulation"):
             int(time.time())
         )
 
-        generate_charts(run_id)
+        try:
+
+            generate_charts(run_id)
+
+        except Exception as e:
+
+            st.error(
+                f"Chart generation failed: {e}"
+            )
+
+            st.stop()
 
         st.cache_data.clear()
 
@@ -348,7 +358,7 @@ if os.path.exists(metrics_path):
     st.divider()
 
     # ======================================
-    # TABLE
+    # DETAILED METRICS TABLE
     # ======================================
 
     st.header("Detailed Metrics")
@@ -451,7 +461,7 @@ if pie_path:
 
         st.image(
             load_image(pie_path),
-            width=450
+            width=350
         )
 
 else:
