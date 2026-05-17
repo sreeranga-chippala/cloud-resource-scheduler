@@ -1,42 +1,11 @@
 import os
-import sys
-import time
 import streamlit as st
 from PIL import Image
 import pandas as pd
-
-# ==========================================
-# FIX WORKING DIRECTORY
-# ==========================================
-
-APP_DIR = os.path.dirname(
-    os.path.abspath(__file__)
-)
-
-os.chdir(APP_DIR)
-
-sys.path.insert(0, APP_DIR)
-
 from charts import generate_charts
 
-# ==========================================
-# PAGE CONFIG
-# ==========================================
-
-st.set_page_config(
-    page_title="Cloud Resource Scheduler",
-    page_icon="☁️",
-    layout="wide"
-)
-
-# ==========================================
-# CLEAN LIGHT THEME
-# ==========================================
-
-st.markdown("""
+hide_streamlit_style = """
 <style>
-
-/* Hide Streamlit default UI */
 
 #MainMenu {
     visibility: hidden;
@@ -51,113 +20,57 @@ header {
 }
 
 [data-testid="stToolbar"] {
+    display: none;
+}
+
+[data-testid="stDecoration"] {
+    display: none;
+}
+
+[data-testid="stStatusWidget"] {
     visibility: hidden;
 }
 
-/* App background */
-
-.stApp {
-    background-color: white;
-}
-
-/* Main padding */
-
-.block-container {
-    padding-top: 2rem;
-    padding-bottom: 2rem;
-}
-
-/* General text */
-
-h1, h2, h3, h4, p, label {
-    color: #111827 !important;
-}
-
-/* Metric cards */
-
-[data-testid="stMetric"] {
-
-    background-color: #f8fafc;
-
-    border: 1px solid #e2e8f0;
-
-    border-radius: 12px;
-
-    padding: 16px;
-}
-
-/* Metric labels */
-
-[data-testid="stMetricLabel"] {
-
-    color: #64748b !important;
-
-    font-size: 14px !important;
-
-    font-weight: 600 !important;
-}
-
-/* Metric values */
-
-[data-testid="stMetricValue"] {
-
-    color: #111827 !important;
-
-    font-size: 30px !important;
-
-    font-weight: bold !important;
-}
-
-/* Dataframe */
-
-[data-testid="stDataFrame"] {
-
-    border: 1px solid #e5e7eb;
-
-    border-radius: 10px;
-}
-
-/* Button */
-
-.stButton > button {
-
-    background-color: #2563eb;
-
-    color: white;
-
-    border: none;
-
-    border-radius: 8px;
-
-    padding: 10px 22px;
-
-    font-size: 16px;
-
-    font-weight: 600;
-}
-
-/* Button hover */
-
-.stButton > button:hover {
-
-    background-color: #1d4ed8;
-
-    color: white;
-}
-
 </style>
-""", unsafe_allow_html=True)
+"""
+
+st.markdown(
+    hide_streamlit_style,
+    unsafe_allow_html=True
+)
+# ==========================================
+# PAGE CONFIG
+# ==========================================
+st.set_page_config(
+    page_title="Cloud Resource Scheduler",
+    page_icon="☁️",
+    layout="wide"
+)
+# ==========================================
+# SIDEBAR
+# ==========================================
+
+st.sidebar.title("Cloud Scheduler")
+
+st.sidebar.markdown("""
+### Features
+
+- Online Scheduling
+- Greedy Scheduling
+- Runtime Analytics
+- Docker Deployment
+- GitHub Actions CI/CD
+- Cloud Deployment
+""")
 
 # ==========================================
 # TITLE
 # ==========================================
 
-st.title(
-    "Cloud Resource Scheduler Dashboard"
-)
+st.title("Cloud Resource Scheduler Dashboard")
 
 st.caption(
-    "Dynamic cloud resource scheduling simulation using Greedy and Online algorithms."
+    "Cloud-native resource scheduling simulation with analytics and DevOps automation."
 )
 
 st.divider()
@@ -165,128 +78,51 @@ st.divider()
 # ==========================================
 # RUN BUTTON
 # ==========================================
-
-VIZ_DIR = os.path.join(
-    APP_DIR,
-    "outputs",
-    "visualizations"
-)
+# ==========================================
+# RUN BUTTON
+# ==========================================
 
 if st.button("Run Simulation"):
 
-    with st.spinner(
-        "Running simulation..."
-    ):
+    with st.spinner("Running cloud scheduling simulation..."):
 
-        # CLEAR OLD CHARTS
-
-        if os.path.exists(VIZ_DIR):
-
-            for file in os.listdir(VIZ_DIR):
-
-                if file.endswith(".png"):
-
-                    os.remove(
-                        os.path.join(
-                            VIZ_DIR,
-                            file
-                        )
+        # Clear old charts first
+        for file in os.listdir("outputs/visualizations"):
+            if file.endswith(".png"):
+                os.remove(
+                    os.path.join(
+                        "outputs/visualizations",
+                        file
                     )
+                )
 
-        # COMPILE INPUT GENERATOR
+        # Compile generator
+        os.system("gcc input_generator.c -o builds/gen")
 
-        os.system(
-            "gcc input_generator.c -o builds/gen"
-        )
+        # Compile scheduler
+        os.system("g++ -std=c++17 main.cpp -o builds/run")
 
-        # COMPILE MAIN PROGRAM
-
-        os.system(
-            "g++ -std=c++17 main.cpp -o builds/run"
-        )
-
-        # GENERATE INPUT
-
+        # Generate workload
         os.system("./builds/gen")
 
-        # RUN SCHEDULER
-
+        # Run scheduler
         os.system("./builds/run")
 
-        # GENERATE CHARTS
+        # Generate charts
+        generate_charts()
 
-        run_id = str(
-            int(time.time())
-        )
-
-        try:
-
-            generate_charts()
-
-        except Exception as e:
-
-            st.error(
-                f"Chart generation failed: {e}"
-            )
-
-            st.stop()
-
+        # Force Streamlit refresh
         st.cache_data.clear()
-
         st.cache_resource.clear()
 
-    st.success(
-        "Simulation completed successfully"
-    )
+    st.success("Simulation completed successfully")
 
     st.rerun()
-
-# ==========================================
-# HELPER FUNCTIONS
-# ==========================================
-
-def load_image(path):
-
-    with open(path, "rb") as f:
-
-        return f.read()
-
-def get_chart_path(base_name):
-
-    if not os.path.exists(VIZ_DIR):
-
-        return None
-
-    candidates = [
-
-        os.path.join(VIZ_DIR, file)
-
-        for file in os.listdir(VIZ_DIR)
-
-        if file.startswith(base_name)
-
-        and file.endswith(".png")
-    ]
-
-    if not candidates:
-
-        return None
-
-    return max(
-        candidates,
-        key=os.path.getmtime
-    )
-
 # ==========================================
 # LOAD METRICS
 # ==========================================
 
-metrics_path = os.path.join(
-    APP_DIR,
-    "outputs",
-    "metrics",
-    "metrics.csv"
-)
+metrics_path = "outputs/metrics/metrics.csv"
 
 if os.path.exists(metrics_path):
 
@@ -295,7 +131,7 @@ if os.path.exists(metrics_path):
     online = metrics.iloc[1]
 
     # ======================================
-    # SYSTEM METRICS
+    # KPI METRICS
     # ======================================
 
     st.header("System Metrics")
@@ -303,62 +139,53 @@ if os.path.exists(metrics_path):
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
-
         st.metric(
             "Revenue",
             f"${int(online['Revenue'])}"
         )
 
     with col2:
-
         st.metric(
             "Accepted Jobs",
             int(online["Accepted"])
         )
 
     with col3:
-
         st.metric(
             "Rejected Jobs",
             int(online["Rejected"])
         )
 
     with col4:
-
         st.metric(
-            "CPU Usage",
+            "CPU Utilization",
             f"{online['CPU']:.2f}%"
         )
-
-    st.markdown("<br>", unsafe_allow_html=True)
 
     col5, col6, col7 = st.columns(3)
 
     with col5:
-
         st.metric(
-            "Storage Usage",
+            "Storage Utilization",
             f"{online['Storage']:.2f}%"
         )
 
     with col6:
-
         st.metric(
-            "RAM Usage",
+            "RAM Utilization",
             f"{online['RAM']:.2f}%"
         )
 
     with col7:
-
         st.metric(
-            "Bandwidth Usage",
+            "Bandwidth Utilization",
             f"{online['BW']:.2f}%"
         )
 
     st.divider()
 
     # ======================================
-    # DETAILED METRICS TABLE
+    # METRICS TABLE
     # ======================================
 
     st.header("Detailed Metrics")
@@ -376,26 +203,26 @@ if os.path.exists(metrics_path):
 
 st.header("Visual Analytics")
 
-charts = [
+top_charts = [
 
     (
         "Revenue Growth",
-        "revenue_growth"
-    ),
-
-    (
-        "Queue Pressure",
-        "queue_pressure"
+        "outputs/visualizations/revenue_growth.png"
     ),
 
     (
         "Greedy Resource Utilization",
-        "greedy_resource_utilization"
+        "outputs/visualizations/greedy_resource_utilization.png"
     ),
 
     (
         "Online Resource Utilization",
-        "online_resource_utilization"
+        "outputs/visualizations/online_resource_utilization.png"
+    ),
+
+    (
+        "Queue Pressure",
+        "outputs/visualizations/queue_pressure.png"
     )
 ]
 
@@ -403,69 +230,67 @@ charts = [
 # DISPLAY CHARTS
 # ==========================================
 
-for i in range(0, len(charts), 2):
+for i in range(0, len(top_charts), 2):
 
     col1, col2 = st.columns(2)
 
     # LEFT CHART
-
     with col1:
 
-        title, base = charts[i]
+        title, path = top_charts[i]
 
-        path = get_chart_path(base)
-
-        if path:
+        if os.path.exists(path):
 
             st.subheader(title)
 
+            image = Image.open(path)
+
             st.image(
-                load_image(path),
+                image,
                 use_container_width=True
             )
 
     # RIGHT CHART
-
     with col2:
 
-        title, base = charts[i + 1]
+        title, path = top_charts[i + 1]
 
-        path = get_chart_path(base)
-
-        if path:
+        if os.path.exists(path):
 
             st.subheader(title)
 
+            image = Image.open(path)
+
             st.image(
-                load_image(path),
+                image,
                 use_container_width=True
             )
 
     st.divider()
 
 # ==========================================
-# JOB DISTRIBUTION
+# PIE CHART
 # ==========================================
 
-st.header("Job Distribution")
+st.subheader("Job Distribution")
 
-pie_path = get_chart_path(
-    "job_distribution"
-)
+_, center_col, _ = st.columns([1, 2, 1])
 
-if pie_path:
+with center_col:
 
-    _, center_col, _ = st.columns([1, 2, 1])
+    pie_path = "outputs/visualizations/job_distribution.png"
 
-    with center_col:
+    if os.path.exists(pie_path):
+
+        image = Image.open(pie_path)
 
         st.image(
-            load_image(pie_path),
-            width=350
+            image,
+            use_container_width=True
         )
 
-else:
+    else:
 
-    st.warning(
-        "Job distribution chart not found."
-    )
+        st.warning(
+            "Job distribution chart not available."
+        )
