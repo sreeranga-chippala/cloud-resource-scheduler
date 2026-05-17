@@ -17,7 +17,6 @@ st.set_page_config(
 # ==========================================
 # SIMPLE CLEAN UI
 # ==========================================
-
 st.markdown("""
 <style>
 
@@ -38,9 +37,13 @@ header {
     padding-bottom: 2rem;
 }
 
+.stApp {
+    background-color: white;
+    color: black;
+}
+
 </style>
 """, unsafe_allow_html=True)
-
 # ==========================================
 # SIDEBAR
 # ==========================================
@@ -276,15 +279,18 @@ st.header("Job Distribution")
 pie_path = (
     "outputs/visualizations/job_distribution.png"
 )
-
 if os.path.exists(pie_path):
 
     image = Image.open(pie_path)
 
-    st.image(
-        image,
-        use_container_width=True
-    )
+    _, center_col, _ = st.columns([1, 2, 1])
+
+    with center_col:
+
+        st.image(
+            image,
+            width=500
+        )
 
 else:
 
