@@ -6,7 +6,6 @@ import seaborn as sns
 import os
 
 def generate_charts():
-    # Anchor all paths to this file's directory — fixes relative path issues
     BASE_DIR     = os.path.dirname(os.path.abspath(__file__))
     VISUAL_DIR   = os.path.join(BASE_DIR, "outputs", "visualizations")
     TIMELINE_CSV = os.path.join(BASE_DIR, "outputs", "metrics", "timeline.csv")
@@ -14,6 +13,11 @@ def generate_charts():
     INPUT_TXT    = os.path.join(BASE_DIR, "builds", "input.txt")
 
     os.makedirs(VISUAL_DIR, exist_ok=True)
+
+    # Validate all required files exist before proceeding
+    for f in [TIMELINE_CSV, METRICS_CSV, INPUT_TXT]:
+        if not os.path.exists(f):
+            raise FileNotFoundError(f"Required file missing: {f}")
 
     sns.set_theme(style="whitegrid", palette="deep")
 
@@ -23,9 +27,8 @@ def generate_charts():
 
     timeline = pd.read_csv(TIMELINE_CSV)
     metrics  = pd.read_csv(METRICS_CSV)
-
-    greedy = metrics.iloc[0]
-    online = metrics.iloc[1]
+    greedy   = metrics.iloc[0]
+    online   = metrics.iloc[1]
 
     # ============================================
     # READ CLUSTER CAPACITY

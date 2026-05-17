@@ -1,7 +1,19 @@
 import os
+import sys
 import streamlit as st
 from PIL import Image
 import pandas as pd
+
+# ==========================================
+# CRITICAL: Fix working directory on EC2
+# Streamlit may run from / or /home/ubuntu
+# This ensures all relative paths work
+# ==========================================
+
+APP_DIR = os.path.dirname(os.path.abspath(__file__))
+os.chdir(APP_DIR)
+sys.path.insert(0, APP_DIR)
+
 from charts import generate_charts
 
 # ==========================================
@@ -39,18 +51,31 @@ st.divider()
 
 if st.button("Run Simulation"):
     with st.spinner("Running cloud scheduling simulation..."):
-        os.system("gcc input_generator.c -o builds/gen")
-        os.system("g++ -std=c++17 main.cpp -o builds/run")
+
+        ret1 = os.system("gcc input_generator.c -o builds/gen")
+        ret2 = os.system("g++ -std=c++17 main.cpp -o builds/run")
+
+        if ret1 != 0 or ret2 != 0:
+            st.error("Compilation failed. Check gcc/g++ and source files.")
+            st.stop()
+
         os.system("./builds/gen")
         os.system("./builds/run")
-        generate_charts()
+
+        try:
+            generate_charts()
+        except Exception as e:
+            st.error(f"Chart generation failed: {e}")
+            st.stop()
+
     st.success("Simulation completed successfully")
+    st.rerun()
 
 # ==========================================
 # LOAD METRICS
 # ==========================================
 
-metrics_path = "outputs/metrics/metrics.csv"
+metrics_path = os.path.join(APP_DIR, "outputs", "metrics", "metrics.csv")
 
 if os.path.exists(metrics_path):
     metrics = pd.read_csv(metrics_path)
@@ -59,7 +84,7 @@ if os.path.exists(metrics_path):
     # KPI METRICS
     st.header("System Metrics")
 
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2, col3, _ = st.columns(4)
     with col1:
         st.metric("Revenue", f"${int(online['Revenue'])}")
     with col2:
@@ -90,11 +115,13 @@ if os.path.exists(metrics_path):
 
 st.header("Visual Analytics")
 
+VIZ = os.path.join(APP_DIR, "outputs", "visualizations")
+
 top_charts = [
-    ("Revenue Growth",              "outputs/visualizations/revenue_growth.png"),
-    ("Greedy Resource Utilization", "outputs/visualizations/greedy_resource_utilization.png"),
-    ("Online Resource Utilization", "outputs/visualizations/online_resource_utilization.png"),
-    ("Queue Pressure",              "outputs/visualizations/queue_pressure.png"),
+    ("Revenue Growth",              os.path.join(VIZ, "revenue_growth.png")),
+    ("Greedy Resource Utilization", os.path.join(VIZ, "greedy_resource_utilization.png")),
+    ("Online Resource Utilization", os.path.join(VIZ, "online_resource_utilization.png")),
+    ("Queue Pressure",              os.path.join(VIZ, "queue_pressure.png")),
 ]
 
 for i in range(0, len(top_charts), 2):
@@ -105,12 +132,16 @@ for i in range(0, len(top_charts), 2):
         if os.path.exists(path):
             st.subheader(title)
             st.image(Image.open(path), use_container_width=True)
+        else:
+            st.warning(f"{title} not available.")
 
     with col2:
         title, path = top_charts[i + 1]
         if os.path.exists(path):
             st.subheader(title)
             st.image(Image.open(path), use_container_width=True)
+        else:
+            st.warning(f"{title} not available.")
 
     st.divider()
 
@@ -119,7 +150,7 @@ st.subheader("Job Distribution")
 _, center_col, _ = st.columns([1, 2, 1])
 
 with center_col:
-    pie_path = "outputs/visualizations/job_distribution.png"
+    pie_path = os.path.join(VIZ, "job_distribution.png")
     if os.path.exists(pie_path):
         st.image(Image.open(pie_path), use_container_width=True)
     else:
