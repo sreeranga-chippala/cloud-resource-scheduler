@@ -45,15 +45,23 @@ st.divider()
 # ==========================================
 # RUN BUTTON
 # ==========================================
+# ==========================================
+# RUN BUTTON
+# ==========================================
 
 if st.button("Run Simulation"):
 
     with st.spinner("Running cloud scheduling simulation..."):
 
-        # Create directories
-        os.makedirs("builds", exist_ok=True)
-        os.makedirs("outputs/metrics", exist_ok=True)
-        os.makedirs("outputs/visualizations", exist_ok=True)
+        # Clear old charts first
+        for file in os.listdir("outputs/visualizations"):
+            if file.endswith(".png"):
+                os.remove(
+                    os.path.join(
+                        "outputs/visualizations",
+                        file
+                    )
+                )
 
         # Compile generator
         os.system("gcc input_generator.c -o builds/gen")
@@ -70,8 +78,13 @@ if st.button("Run Simulation"):
         # Generate charts
         generate_charts()
 
+        # Force Streamlit refresh
+        st.cache_data.clear()
+        st.cache_resource.clear()
+
     st.success("Simulation completed successfully")
 
+    st.rerun()
 # ==========================================
 # LOAD METRICS
 # ==========================================
