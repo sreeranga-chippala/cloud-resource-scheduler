@@ -60,7 +60,12 @@ if st.button("Run Simulation"):
 
         os.system("./builds/run")
 
-        os.system("python3 charts.py")
+        python_exec = "venv/bin/python"
+
+        if not os.path.exists(python_exec):
+            python_exec = "python3"
+
+        os.system(f"{python_exec} charts.py")
 
     st.success("Simulation completed successfully")
 
