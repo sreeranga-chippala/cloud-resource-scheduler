@@ -159,40 +159,37 @@ if os.path.exists(metrics_path):
 
 st.header("Visual Analytics")
 
-run_id = st.session_state.get("run_id")
+import time
+
+timestamp = int(time.time())
 
 top_charts = [
 
     (
         "Revenue Growth",
-        f"outputs/visualizations/revenue_growth_{run_id}.png"
+        "outputs/visualizations/revenue_growth.png"
     ),
 
     (
         "Greedy Resource Utilization",
-        f"outputs/visualizations/greedy_resource_utilization_{run_id}.png"
+        "outputs/visualizations/greedy_resource_utilization.png"
     ),
 
     (
         "Online Resource Utilization",
-        f"outputs/visualizations/online_resource_utilization_{run_id}.png"
+        "outputs/visualizations/online_resource_utilization.png"
     ),
 
     (
         "Queue Pressure",
-        f"outputs/visualizations/queue_pressure_{run_id}.png"
+        "outputs/visualizations/queue_pressure.png"
     )
 ]
-
-# ==========================================
-# DISPLAY CHARTS
-# ==========================================
 
 for i in range(0, len(top_charts), 2):
 
     col1, col2 = st.columns(2)
 
-    # LEFT
     with col1:
 
         title, path = top_charts[i]
@@ -201,14 +198,12 @@ for i in range(0, len(top_charts), 2):
 
             st.subheader(title)
 
-            image = Image.open(path)
+            with open(path, "rb") as img:
+                st.image(
+                    img.read(),
+                    width="stretch"
+                )
 
-            st.image(
-                image,
-                use_container_width=True
-            )
-
-    # RIGHT
     with col2:
 
         title, path = top_charts[i + 1]
@@ -217,12 +212,11 @@ for i in range(0, len(top_charts), 2):
 
             st.subheader(title)
 
-            image = Image.open(path)
-
-            st.image(
-                image,
-                use_container_width=True
-            )
+            with open(path, "rb") as img:
+                st.image(
+                    img.read(),
+                    width="stretch"
+                )
 
     st.divider()
 
@@ -232,25 +226,20 @@ for i in range(0, len(top_charts), 2):
 
 st.subheader("Job Distribution")
 
-_, center_col, _ = st.columns([1, 2, 1])
+center1, center2, center3 = st.columns([1,2,1])
 
-with center_col:
+with center2:
 
-    pie_path = (
-        f"outputs/visualizations/job_distribution_{run_id}.png"
-    )
+    pie_chart = "outputs/visualizations/job_distribution.png"
 
-    if os.path.exists(pie_path):
+    if os.path.exists(pie_chart):
 
-        image = Image.open(pie_path)
-
-        st.image(
-            image,
-            use_container_width=True
-        )
+        with open(pie_chart, "rb") as img:
+            st.image(
+                img.read(),
+                width="stretch"
+            )
 
     else:
 
-        st.warning(
-            "Job distribution chart not available."
-        )
+        st.warning("Job distribution chart not available.")
