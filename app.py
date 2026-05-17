@@ -28,12 +28,50 @@ st.set_page_config(
 
 st.markdown("""
 <style>
+
 #MainMenu { visibility: hidden; }
 footer    { visibility: hidden; }
 header    { visibility: hidden; }
 [data-testid="stToolbar"] { visibility: hidden; }
-.block-container { padding-top: 2rem; padding-bottom: 2rem; }
-.stApp { background-color: white; color: black; }
+
+.block-container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+.stApp {
+    background-color: white;
+}
+
+/* Fix metric label, value and delta all black on white */
+[data-testid="stMetric"] {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+[data-testid="stMetricLabel"] p,
+[data-testid="stMetricLabel"] {
+    color: #64748b !important;
+    font-size: 14px !important;
+}
+
+[data-testid="stMetricValue"],
+[data-testid="stMetricValue"] > div {
+    color: #0f172a !important;
+    font-size: 28px !important;
+    font-weight: 700 !important;
+}
+
+/* Dataframe text */
+.dataframe { color: black !important; }
+
+/* All general text black */
+p, h1, h2, h3, h4, label {
+    color: #0f172a !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -67,21 +105,20 @@ st.divider()
 
 VIZ_DIR = os.path.join(APP_DIR, "outputs", "visualizations")
 
-if st.button("Run Simulation"):
+if st.button("▶ Run Simulation"):
     with st.spinner("Running simulation..."):
 
         # Clear old charts
         if os.path.exists(VIZ_DIR):
-            for file in os.listdir(VIZ_DIR):
-                if file.endswith(".png"):
-                    os.remove(os.path.join(VIZ_DIR, file))
+            for f in os.listdir(VIZ_DIR):
+                if f.endswith(".png"):
+                    os.remove(os.path.join(VIZ_DIR, f))
 
         os.system("gcc input_generator.c -o builds/gen")
         os.system("g++ -std=c++17 main.cpp -o builds/run")
         os.system("./builds/gen")
         os.system("./builds/run")
 
-        # Pass run_id to match charts.py signature
         run_id = str(int(time.time()))
         try:
             generate_charts(run_id)
@@ -93,11 +130,11 @@ if st.button("Run Simulation"):
         st.cache_data.clear()
         st.cache_resource.clear()
 
-    st.success("Simulation completed")
+    st.success("✅ Simulation completed")
     st.rerun()
 
 # ==========================================
-# HELPER — always reads fresh bytes from disk
+# HELPER
 # ==========================================
 
 def load_image(path):
@@ -105,7 +142,6 @@ def load_image(path):
         return f.read()
 
 def get_chart_path(base_name):
-    """Find the most recently modified PNG matching base_name."""
     if not os.path.exists(VIZ_DIR):
         return None
     candidates = [
@@ -129,21 +165,21 @@ if os.path.exists(metrics_path):
 
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-        st.metric("Revenue",       f"${int(online['Revenue'])}")
+        st.metric("💰 Revenue",       f"${int(online['Revenue'])}")
     with col2:
-        st.metric("Accepted Jobs", int(online["Accepted"]))
+        st.metric("✅ Accepted Jobs", int(online["Accepted"]))
     with col3:
-        st.metric("Rejected Jobs", int(online["Rejected"]))
+        st.metric("❌ Rejected Jobs", int(online["Rejected"]))
     with col4:
-        st.metric("CPU Usage",     f"{online['CPU']:.2f}%")
+        st.metric("🖥️ CPU Usage",    f"{online['CPU']:.2f}%")
 
     col5, col6, col7 = st.columns(3)
     with col5:
-        st.metric("Storage",   f"{online['Storage']:.2f}%")
+        st.metric("💾 Storage",   f"{online['Storage']:.2f}%")
     with col6:
-        st.metric("RAM",       f"{online['RAM']:.2f}%")
+        st.metric("🧠 RAM",       f"{online['RAM']:.2f}%")
     with col7:
-        st.metric("Bandwidth", f"{online['BW']:.2f}%")
+        st.metric("📡 Bandwidth", f"{online['BW']:.2f}%")
 
     st.divider()
 
