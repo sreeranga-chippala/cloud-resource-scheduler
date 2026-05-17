@@ -1,8 +1,8 @@
 import os
 import streamlit as st
 import pandas as pd
-import plotly.express as px
 import plotly.graph_objects as go
+import plotly.express as px
 
 # ==========================================
 # PAGE CONFIG
@@ -22,13 +22,13 @@ st.markdown("""
 <style>
 
 .stApp {
-    background-color: #0b1220;
+    background-color: #020817;
     color: white;
 }
 
 section[data-testid="stSidebar"] {
-    background-color: #111827;
-    border-right: 1px solid #1f2937;
+    background-color: #0f172a;
+    border-right: 1px solid #1e293b;
 }
 
 .block-container {
@@ -37,16 +37,23 @@ section[data-testid="stSidebar"] {
 }
 
 .metric-card {
-    background-color: #111827;
-    border: 1px solid #1f2937;
+    background: #0f172a;
+    border: 1px solid #1e293b;
     padding: 20px;
-    border-radius: 16px;
+    border-radius: 18px;
     text-align: center;
+    transition: 0.3s;
+}
+
+.metric-card:hover {
+    border: 1px solid #3b82f6;
+    transform: translateY(-2px);
 }
 
 .metric-title {
-    color: #9ca3af;
+    color: #94a3b8;
     font-size: 15px;
+    margin-bottom: 10px;
 }
 
 .metric-value {
@@ -55,11 +62,11 @@ section[data-testid="stSidebar"] {
     font-weight: bold;
 }
 
-.chart-card {
-    background-color: #111827;
-    border: 1px solid #1f2937;
-    border-radius: 16px;
-    padding: 10px;
+.chart-container {
+    background: #0f172a;
+    border: 1px solid #1e293b;
+    padding: 15px;
+    border-radius: 18px;
 }
 
 h1, h2, h3 {
@@ -111,12 +118,12 @@ st.caption(
 st.divider()
 
 # ==========================================
-# RUN BUTTON
+# RUN SIMULATION
 # ==========================================
 
 if st.button("🚀 Run Simulation"):
 
-    with st.spinner("Running cloud scheduling simulation..."):
+    with st.spinner("Running simulation..."):
 
         os.system("gcc input_generator.c -o builds/gen")
 
@@ -129,7 +136,7 @@ if st.button("🚀 Run Simulation"):
     st.success("Simulation completed successfully")
 
 # ==========================================
-# LOAD DATA
+# LOAD CSV FILES
 # ==========================================
 
 metrics_path = "outputs/metrics/metrics.csv"
@@ -151,7 +158,7 @@ if os.path.exists(metrics_path) and os.path.exists(timeline_path):
 
     col1, col2, col3, col4 = st.columns(4)
 
-    cards = [
+    metrics_data = [
 
         ("💰 Revenue", f"${int(online['Revenue'])}"),
 
@@ -164,7 +171,7 @@ if os.path.exists(metrics_path) and os.path.exists(timeline_path):
 
     for col, (title, value) in zip(
         [col1, col2, col3, col4],
-        cards
+        metrics_data
     ):
 
         with col:
@@ -180,18 +187,18 @@ if os.path.exists(metrics_path) and os.path.exists(timeline_path):
 
     col5, col6, col7 = st.columns(3)
 
-    more_cards = [
+    more_metrics = [
 
-        ("💾 Storage Usage", f"{online['Storage']:.2f}%"),
+        ("💾 Storage", f"{online['Storage']:.2f}%"),
 
-        ("🧠 RAM Usage", f"{online['RAM']:.2f}%"),
+        ("🧠 RAM", f"{online['RAM']:.2f}%"),
 
-        ("📡 Bandwidth Usage", f"{online['BW']:.2f}%")
+        ("📡 Bandwidth", f"{online['BW']:.2f}%")
     ]
 
     for col, (title, value) in zip(
         [col5, col6, col7],
-        more_cards
+        more_metrics
     ):
 
         with col:
@@ -206,7 +213,7 @@ if os.path.exists(metrics_path) and os.path.exists(timeline_path):
     st.divider()
 
     # ======================================
-    # RESOURCE UTILIZATION CHART
+    # RESOURCE UTILIZATION
     # ======================================
 
     st.subheader("📈 Resource Utilization")
@@ -254,12 +261,18 @@ if os.path.exists(metrics_path) and os.path.exists(timeline_path):
     )
 
     fig1.update_layout(
+
         template="plotly_dark",
-        paper_bgcolor="#111827",
-        plot_bgcolor="#111827",
+
+        paper_bgcolor="#0f172a",
+
+        plot_bgcolor="#0f172a",
+
         font=dict(color="white"),
+
         height=500,
-        margin=dict(l=20, r=20, t=50, b=20)
+
+        margin=dict(l=20, r=20, t=40, b=20)
     )
 
     st.plotly_chart(
@@ -275,25 +288,39 @@ if os.path.exists(metrics_path) and os.path.exists(timeline_path):
 
     colA, colB = st.columns(2)
 
+    # ======================================
+    # REVENUE CHART
+    # ======================================
+
     with colA:
 
         st.subheader("💰 Revenue Growth")
 
-        fig2 = px.line(
-            timeline,
-            x="Time",
-            y="Revenue",
-            template="plotly_dark"
-        )
+        fig2 = go.Figure()
 
-        fig2.update_traces(
-            line=dict(color="#3b82f6", width=3)
+        fig2.add_trace(
+            go.Scatter(
+                x=timeline["Time"],
+                y=timeline["Revenue"],
+                mode="lines",
+                line=dict(
+                    color="#3b82f6",
+                    width=3
+                ),
+                name="Revenue"
+            )
         )
 
         fig2.update_layout(
-            paper_bgcolor="#111827",
-            plot_bgcolor="#111827",
+
+            template="plotly_dark",
+
+            paper_bgcolor="#0f172a",
+
+            plot_bgcolor="#0f172a",
+
             font=dict(color="white"),
+
             height=400
         )
 
@@ -302,25 +329,39 @@ if os.path.exists(metrics_path) and os.path.exists(timeline_path):
             use_container_width=True
         )
 
+    # ======================================
+    # QUEUE CHART
+    # ======================================
+
     with colB:
 
         st.subheader("⏳ Queue Pressure")
 
-        fig3 = px.line(
-            timeline,
-            x="Time",
-            y="Queue",
-            template="plotly_dark"
-        )
+        fig3 = go.Figure()
 
-        fig3.update_traces(
-            line=dict(color="#ef4444", width=3)
+        fig3.add_trace(
+            go.Scatter(
+                x=timeline["Time"],
+                y=timeline["Queue"],
+                mode="lines",
+                line=dict(
+                    color="#ef4444",
+                    width=3
+                ),
+                name="Queue"
+            )
         )
 
         fig3.update_layout(
-            paper_bgcolor="#111827",
-            plot_bgcolor="#111827",
+
+            template="plotly_dark",
+
+            paper_bgcolor="#0f172a",
+
+            plot_bgcolor="#0f172a",
+
             font=dict(color="white"),
+
             height=400
         )
 
@@ -332,7 +373,7 @@ if os.path.exists(metrics_path) and os.path.exists(timeline_path):
     st.divider()
 
     # ======================================
-    # JOB DISTRIBUTION
+    # PIE CHART
     # ======================================
 
     st.subheader("🧩 Job Distribution")
@@ -348,11 +389,15 @@ if os.path.exists(metrics_path) and os.path.exists(timeline_path):
     })
 
     fig4 = px.pie(
+
         pie_data,
+
         names="Status",
+
         values="Count",
-        template="plotly_dark",
-        hole=0.4,
+
+        hole=0.45,
+
         color_discrete_sequence=[
             "#10b981",
             "#ef4444"
@@ -360,9 +405,15 @@ if os.path.exists(metrics_path) and os.path.exists(timeline_path):
     )
 
     fig4.update_layout(
-        paper_bgcolor="#111827",
-        plot_bgcolor="#111827",
+
+        template="plotly_dark",
+
+        paper_bgcolor="#0f172a",
+
+        plot_bgcolor="#0f172a",
+
         font=dict(color="white"),
+
         height=500
     )
 

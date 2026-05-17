@@ -29,6 +29,7 @@ jobs:
             git pull origin main
 
             source venv/bin/activate
+            pip install plotly
 
             rm -f outputs/metrics/*.csv
             rm -f outputs/visualizations/*.png
