@@ -221,7 +221,7 @@ if st.button("Run Simulation"):
 
         try:
 
-            generate_charts(run_id)
+            generate_charts()
 
         except Exception as e:
 
