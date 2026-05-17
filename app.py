@@ -43,7 +43,7 @@ st.markdown(
 # ==========================================
 st.set_page_config(
     page_title="Cloud Resource Scheduler",
-    page_icon="☁️",
+    page_icon="assets/logo.png",
     layout="wide"
 )
 # ==========================================
