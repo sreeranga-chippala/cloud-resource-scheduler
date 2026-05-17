@@ -1,34 +1,35 @@
 import os
-import sys
+import time
 import streamlit as st
 from PIL import Image
 import pandas as pd
-
-# ==========================================
-# CRITICAL: Fix working directory on EC2
-# Streamlit may run from / or /home/ubuntu
-# This ensures all relative paths work
-# ==========================================
-
-APP_DIR = os.path.dirname(os.path.abspath(__file__))
-os.chdir(APP_DIR)
-sys.path.insert(0, APP_DIR)
-
 from charts import generate_charts
 
 # ==========================================
 # PAGE CONFIG
 # ==========================================
 
-st.set_page_config(page_title="Cloud Resource Scheduler", layout="wide")
+st.set_page_config(
+    page_title="Cloud Resource Scheduler",
+    layout="wide"
+)
+
+# ==========================================
+# SESSION STATE
+# ==========================================
+
+if "run_id" not in st.session_state:
+    st.session_state["run_id"] = "default"
 
 # ==========================================
 # SIDEBAR
 # ==========================================
 
 st.sidebar.title("Cloud Scheduler")
+
 st.sidebar.markdown("""
 ### Features
+
 - Online Scheduling
 - Greedy Scheduling
 - Runtime Analytics
@@ -42,7 +43,11 @@ st.sidebar.markdown("""
 # ==========================================
 
 st.title("Cloud Resource Scheduler Dashboard")
-st.caption("Cloud-native resource scheduling simulation with analytics and DevOps automation.")
+
+st.caption(
+    "Cloud-native resource scheduling simulation with analytics and DevOps automation."
+)
+
 st.divider()
 
 # ==========================================
@@ -50,63 +55,102 @@ st.divider()
 # ==========================================
 
 if st.button("Run Simulation"):
+
+    run_id = str(int(time.time()))
+
+    st.session_state["run_id"] = run_id
+
     with st.spinner("Running cloud scheduling simulation..."):
 
-        ret1 = os.system("gcc input_generator.c -o builds/gen")
-        ret2 = os.system("g++ -std=c++17 main.cpp -o builds/run")
+        os.system("gcc input_generator.c -o builds/gen")
 
-        if ret1 != 0 or ret2 != 0:
-            st.error("Compilation failed. Check gcc/g++ and source files.")
-            st.stop()
+        os.system("g++ -std=c++17 main.cpp -o builds/run")
 
         os.system("./builds/gen")
+
         os.system("./builds/run")
 
-        try:
-            generate_charts()
-        except Exception as e:
-            st.error(f"Chart generation failed: {e}")
-            st.stop()
+        generate_charts(run_id)
 
     st.success("Simulation completed successfully")
-    st.rerun()
 
 # ==========================================
 # LOAD METRICS
 # ==========================================
 
-metrics_path = os.path.join(APP_DIR, "outputs", "metrics", "metrics.csv")
+metrics_path = "outputs/metrics/metrics.csv"
 
 if os.path.exists(metrics_path):
+
     metrics = pd.read_csv(metrics_path)
+
     online = metrics.iloc[1]
 
+    # ======================================
     # KPI METRICS
+    # ======================================
+
     st.header("System Metrics")
 
-    col1, col2, col3, _ = st.columns(4)
-    with col1:
-        st.metric("Revenue", f"${int(online['Revenue'])}")
-    with col2:
-        st.metric("Accepted Jobs", int(online["Accepted"]))
-    with col3:
-        st.metric("Rejected Jobs", int(online["Rejected"]))
+    col1, col2, col3, col4 = st.columns(4)
 
-    col5, col6, col7, col8 = st.columns(4)
+    with col1:
+        st.metric(
+            "Revenue",
+            f"${int(online['Revenue'])}"
+        )
+
+    with col2:
+        st.metric(
+            "Accepted Jobs",
+            int(online["Accepted"])
+        )
+
+    with col3:
+        st.metric(
+            "Rejected Jobs",
+            int(online["Rejected"])
+        )
+
+    with col4:
+        st.metric(
+            "CPU Utilization",
+            f"{online['CPU']:.2f}%"
+        )
+
+    col5, col6, col7 = st.columns(3)
+
     with col5:
-        st.metric("CPU Utilization", f"{online['CPU']:.2f}%")
+        st.metric(
+            "Storage Utilization",
+            f"{online['Storage']:.2f}%"
+        )
+
     with col6:
-        st.metric("Storage Utilization", f"{online['Storage']:.2f}%")
+        st.metric(
+            "RAM Utilization",
+            f"{online['RAM']:.2f}%"
+        )
+
     with col7:
-        st.metric("RAM Utilization", f"{online['RAM']:.2f}%")
-    with col8:
-        st.metric("Bandwidth Utilization", f"{online['BW']:.2f}%")
+        st.metric(
+            "Bandwidth Utilization",
+            f"{online['BW']:.2f}%"
+        )
 
     st.divider()
 
+    # ======================================
     # METRICS TABLE
+    # ======================================
+
     st.header("Detailed Metrics")
-    st.dataframe(metrics, use_container_width=True)
+
+    st.dataframe(
+        metrics,
+        use_container_width=True
+    )
+
     st.divider()
 
 # ==========================================
@@ -115,43 +159,98 @@ if os.path.exists(metrics_path):
 
 st.header("Visual Analytics")
 
-VIZ = os.path.join(APP_DIR, "outputs", "visualizations")
+run_id = st.session_state.get("run_id")
 
 top_charts = [
-    ("Revenue Growth",              os.path.join(VIZ, "revenue_growth.png")),
-    ("Greedy Resource Utilization", os.path.join(VIZ, "greedy_resource_utilization.png")),
-    ("Online Resource Utilization", os.path.join(VIZ, "online_resource_utilization.png")),
-    ("Queue Pressure",              os.path.join(VIZ, "queue_pressure.png")),
+
+    (
+        "Revenue Growth",
+        f"outputs/visualizations/revenue_growth_{run_id}.png"
+    ),
+
+    (
+        "Greedy Resource Utilization",
+        f"outputs/visualizations/greedy_resource_utilization_{run_id}.png"
+    ),
+
+    (
+        "Online Resource Utilization",
+        f"outputs/visualizations/online_resource_utilization_{run_id}.png"
+    ),
+
+    (
+        "Queue Pressure",
+        f"outputs/visualizations/queue_pressure_{run_id}.png"
+    )
 ]
 
+# ==========================================
+# DISPLAY CHARTS
+# ==========================================
+
 for i in range(0, len(top_charts), 2):
+
     col1, col2 = st.columns(2)
 
+    # LEFT
     with col1:
-        title, path = top_charts[i]
-        if os.path.exists(path):
-            st.subheader(title)
-            st.image(Image.open(path), use_container_width=True)
-        else:
-            st.warning(f"{title} not available.")
 
-    with col2:
-        title, path = top_charts[i + 1]
+        title, path = top_charts[i]
+
         if os.path.exists(path):
+
             st.subheader(title)
-            st.image(Image.open(path), use_container_width=True)
-        else:
-            st.warning(f"{title} not available.")
+
+            image = Image.open(path)
+
+            st.image(
+                image,
+                use_container_width=True
+            )
+
+    # RIGHT
+    with col2:
+
+        title, path = top_charts[i + 1]
+
+        if os.path.exists(path):
+
+            st.subheader(title)
+
+            image = Image.open(path)
+
+            st.image(
+                image,
+                use_container_width=True
+            )
 
     st.divider()
 
+# ==========================================
 # PIE CHART
+# ==========================================
+
 st.subheader("Job Distribution")
+
 _, center_col, _ = st.columns([1, 2, 1])
 
 with center_col:
-    pie_path = os.path.join(VIZ, "job_distribution.png")
+
+    pie_path = (
+        f"outputs/visualizations/job_distribution_{run_id}.png"
+    )
+
     if os.path.exists(pie_path):
-        st.image(Image.open(pie_path), use_container_width=True)
+
+        image = Image.open(pie_path)
+
+        st.image(
+            image,
+            use_container_width=True
+        )
+
     else:
-        st.warning("Job distribution chart not available.")
+
+        st.warning(
+            "Job distribution chart not available."
+        )
