@@ -27,17 +27,83 @@ st.set_page_config(
 # ==========================================
 # SIMPLE CLEAN CSS
 # ==========================================
+# ==========================================
+# CLEAN WHITE UI CSS
+# ==========================================
 
 st.markdown("""
 <style>
 
-#MainMenu {visibility: hidden;}
-footer {visibility: hidden;}
-header {visibility: hidden;}
+/* Remove Streamlit header */
+header {
+    visibility: hidden;
+}
 
+/* Remove footer */
+footer {
+    visibility: hidden;
+}
+
+/* Remove hamburger menu */
+#MainMenu {
+    visibility: hidden;
+}
+
+/* Full white background */
+.stApp {
+    background-color: white;
+}
+
+/* Main container */
 .block-container {
-    padding-top: 2rem;
+    padding-top: 1rem;
     padding-bottom: 2rem;
+    max-width: 1400px;
+}
+
+/* Remove dark toolbar */
+[data-testid="stToolbar"] {
+    display: none;
+}
+
+/* Remove top decoration */
+[data-testid="stDecoration"] {
+    display: none;
+}
+
+/* Metric cards */
+[data-testid="metric-container"] {
+    background-color: #f8f9fa;
+    border: 1px solid #e6e6e6;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+/* Dataframe */
+[data-testid="stDataFrame"] {
+    border-radius: 10px;
+}
+
+/* Buttons */
+.stButton > button {
+    width: 100%;
+    border-radius: 10px;
+    height: 3em;
+    font-size: 16px;
+    font-weight: 600;
+    background-color: #2563eb;
+    color: white;
+    border: none;
+}
+
+/* Chart spacing */
+img {
+    border-radius: 10px;
+}
+
+/* Remove unnecessary padding */
+section.main > div {
+    padding-top: 0rem;
 }
 
 </style>
