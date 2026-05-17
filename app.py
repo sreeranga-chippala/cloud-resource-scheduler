@@ -15,8 +15,9 @@ st.set_page_config(
 )
 
 # ==========================================
-# SIMPLE CLEAN UI
+# CLEAN UI
 # ==========================================
+
 st.markdown("""
 <style>
 
@@ -42,8 +43,38 @@ header {
     color: black;
 }
 
+/* METRIC CARDS */
+
+div[data-testid="metric-container"] {
+
+    background-color: #f5f5f5;
+
+    border: 1px solid #dcdcdc;
+
+    padding: 15px;
+
+    border-radius: 10px;
+}
+
+/* METRIC LABEL */
+
+div[data-testid="metric-container"] label {
+
+    color: black !important;
+
+    font-weight: bold;
+}
+
+/* METRIC VALUE */
+
+div[data-testid="metric-container"] div {
+
+    color: black !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
+
 # ==========================================
 # SIDEBAR
 # ==========================================
@@ -75,50 +106,70 @@ st.caption(
 st.divider()
 
 # ==========================================
-# RUN BUTTON
+# RUN SIMULATION
 # ==========================================
 
 if st.button("Run Simulation"):
 
     with st.spinner("Running simulation..."):
 
-        # Clear old charts
-        if os.path.exists("outputs/visualizations"):
+        # CREATE FOLDERS
 
-            for file in os.listdir("outputs/visualizations"):
+        os.makedirs(
+            "outputs/visualizations",
+            exist_ok=True
+        )
 
-                if file.endswith(".png"):
+        os.makedirs(
+            "builds",
+            exist_ok=True
+        )
 
-                    os.remove(
-                        os.path.join(
-                            "outputs/visualizations",
-                            file
-                        )
+        # CLEAR OLD CHARTS
+
+        for file in os.listdir(
+            "outputs/visualizations"
+        ):
+
+            if file.endswith(".png"):
+
+                os.remove(
+                    os.path.join(
+                        "outputs/visualizations",
+                        file
                     )
+                )
 
-        # Compile generator
+        # COMPILE GENERATOR
+
         os.system(
             "gcc input_generator.c -o builds/gen"
         )
 
-        # Compile scheduler
+        # COMPILE MAIN
+
         os.system(
             "g++ -std=c++17 main.cpp -o builds/run"
         )
 
-        # Generate jobs
+        # GENERATE INPUT
+
         os.system("./builds/gen")
 
-        # Run simulation
+        # RUN SIMULATION
+
         os.system("./builds/run")
 
-        # Generate charts
+        # GENERATE CHARTS
+
         generate_charts()
+
+        # CLEAR CACHE
 
         st.cache_data.clear()
         st.cache_resource.clear()
 
-    st.success("Simulation completed")
+    st.success("Simulation completed successfully")
 
     st.rerun()
 
@@ -135,7 +186,7 @@ if os.path.exists(metrics_path):
     online = metrics.iloc[1]
 
     # ======================================
-    # METRICS
+    # SYSTEM METRICS
     # ======================================
 
     st.header("System Metrics")
@@ -143,53 +194,62 @@ if os.path.exists(metrics_path):
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
+
         st.metric(
             "Revenue",
             f"${int(online['Revenue'])}"
         )
 
     with col2:
+
         st.metric(
             "Accepted Jobs",
             int(online["Accepted"])
         )
 
     with col3:
+
         st.metric(
             "Rejected Jobs",
             int(online["Rejected"])
         )
 
     with col4:
+
         st.metric(
             "CPU Usage",
             f"{online['CPU']:.2f}%"
         )
 
+    st.markdown("<br>", unsafe_allow_html=True)
+
     col5, col6, col7 = st.columns(3)
 
     with col5:
+
         st.metric(
-            "Storage",
+            "Storage Usage",
             f"{online['Storage']:.2f}%"
         )
 
     with col6:
+
         st.metric(
-            "RAM",
+            "RAM Usage",
             f"{online['RAM']:.2f}%"
         )
 
     with col7:
+
         st.metric(
-            "Bandwidth",
+            "Bandwidth Usage",
             f"{online['BW']:.2f}%"
         )
 
     st.divider()
 
     # ======================================
-    # DETAILED TABLE
+    # DETAILED METRICS TABLE
     # ======================================
 
     st.header("Detailed Metrics")
@@ -238,6 +298,8 @@ for i in range(0, len(charts), 2):
 
     col1, col2 = st.columns(2)
 
+    # LEFT CHART
+
     with col1:
 
         title, path = charts[i]
@@ -252,6 +314,8 @@ for i in range(0, len(charts), 2):
                 image,
                 use_container_width=True
             )
+
+    # RIGHT CHART
 
     with col2:
 
@@ -279,6 +343,7 @@ st.header("Job Distribution")
 pie_path = (
     "outputs/visualizations/job_distribution.png"
 )
+
 if os.path.exists(pie_path):
 
     image = Image.open(pie_path)
