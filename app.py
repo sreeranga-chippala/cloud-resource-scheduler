@@ -1,5 +1,6 @@
 import os
 import streamlit as st
+from PIL import Image
 import pandas as pd
 
 # ==========================================
@@ -199,8 +200,10 @@ for i in range(0, len(top_charts), 2):
 
             st.subheader(title)
 
+            image = Image.open(path)
+
             st.image(
-                path,
+                image,
                 width="stretch"
             )
 
@@ -216,12 +219,13 @@ for i in range(0, len(top_charts), 2):
 
             st.subheader(title)
 
+            image = Image.open(path)
+
             st.image(
-                path,
+                image,
                 width="stretch"
             )
-
-    st.divider()
+            st.divider()
 
 # ==========================================
 # PIE CHART SEPARATELY
@@ -237,8 +241,10 @@ with center_col2:
 
     if os.path.exists(pie_chart):
 
+        image = Image.open(pie_chart)
+
         st.image(
-            pie_chart,
+            image,
             width="stretch"
         )
 
