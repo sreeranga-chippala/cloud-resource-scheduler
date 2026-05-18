@@ -223,7 +223,7 @@ def generate_charts():
 
     ax.plot(
         timeline["Time"],
-        timeline["Revenue"]
+        timeline["Revenue$"]
     )
 
     ax.set_title("Revenue Growth")
