@@ -28,6 +28,7 @@ The system dynamically allocates CPU, RAM, Storage, and Bandwidth resources to i
 | Layer | Technology |
 |---|---|
 | Core Algorithms | C++ |
+| Input Generator | C |
 | Visualization | Python |
 | Analytics | Pandas |
 | Graphs | Matplotlib / Seaborn |
